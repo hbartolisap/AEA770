@@ -1,0 +1,2782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diseño Eléctrico AEA 770 - Suite v8</title>
+
+<!-- PWA Manifest e íconos -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#667eea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AEA 770">
+
+<!-- Librerías LOCALES (sin CDN) -->
+<script src="libs/jspdf.umd.min.js"></script>
+<script src="libs/jspdf.plugin.autotable.min.js"></script>
+<script src="libs/xlsx.full.min.js"></script>
+
+<style>
+:root {
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: #ffffff;
+    --card-header: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    --text: #333;
+    --text-light: #777;
+    --border: #eee;
+    --input-bg: #fff;
+    --input-border: #ddd;
+    --table-header: #f8f9fa;
+    --table-hover: #f8f9fa;
+    --accent: #667eea;
+    --accent-dark: #5568d3;
+}
+body.dark {
+    --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --card-bg: #1e1e2e;
+    --card-header: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+    --text: #e0e0e0;
+    --text-light: #aaa;
+    --border: #333;
+    --input-bg: #2a2a3e;
+    --input-border: #444;
+    --table-header: #2a2a3e;
+    --table-hover: #2f2f45;
+    --accent: #7b8ff0;
+    --accent-dark: #667eea;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--text);
+}
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+header {
+    background: var(--card-header);
+    color: white;
+    padding: 15px 20px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 15px;
+    align-items: center;
+}
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.header-center {
+    text-align: center;
+    min-width: 0;
+}
+.header-center h1 {
+    font-size: 1.4em;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.header-center p {
+    font-size: 0.78em;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.header-right {
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+}
+.header-right button {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    padding: 7px 12px;
+    border-radius: 18px;
+    cursor: pointer;
+    font-size: 0.78em;
+    margin: 0;
+    white-space: nowrap;
+    width: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s, background 0.3s;
+}
+.header-right button:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+.proyecto-selector {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    padding: 7px 12px;
+    border-radius: 18px;
+    font-size: 0.78em;
+    cursor: pointer;
+    max-width: 200px;
+    width: auto;
+}
+.proyecto-selector option { color: #333; }
+
+@media (max-width: 900px) {
+    header {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .header-left, .header-center, .header-right {
+        justify-content: center;
+    }
+    .header-center h1 { white-space: normal; }
+    .header-center p { white-space: normal; }
+    .header-right { flex-wrap: wrap; }
+    .proyecto-selector { max-width: 100%; }
+}
+label {
+    display: block; font-weight: 600; margin-bottom: 4px;
+    color: var(--text-light); font-size: 0.82em;
+}
+input, select, textarea {
+    width: 100%; padding: 9px 11px;
+    border: 2px solid var(--input-border);
+    border-radius: 8px; font-size: 0.9em;
+    background: var(--input-bg); color: var(--text);
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+input[readonly] { background: var(--table-header); font-weight: 700; }
+button {
+    background: var(--accent); color: white; border: none;
+    padding: 9px 18px; border-radius: 8px;
+    font-size: 0.9em; font-weight: 600; cursor: pointer;
+    margin-right: 6px; margin-bottom: 5px;
+}
+button:hover { background: var(--accent-dark); }
+button.danger { background: #e74c3c; }
+button.danger:hover { background: #c0392b; }
+button.success { background: #27ae60; }
+button.success:hover { background: #229954; }
+button.export { background: #e67e22; }
+button.export:hover { background: #d35400; }
+button.info { background: #3498db; }
+button.info:hover { background: #2980b9; }
+button.small { padding: 4px 9px; font-size: 0.78em; margin: 0; }
+table {
+    width: 100%; border-collapse: collapse; margin-top: 10px;
+    font-size: 0.88em;
+}
+th, td {
+    padding: 9px 7px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th {
+    background: var(--table-header); color: var(--text);
+    font-weight: 700; font-size: 0.78em; text-transform: uppercase;
+}
+tr:hover { background: var(--table-hover); }
+.result-card {
+    background: var(--table-header); border-left: 4px solid var(--accent);
+    padding: 15px; border-radius: 8px; margin-bottom: 15px;
+}
+.result-card h3 { color: var(--text); font-size: 1em; margin-bottom: 10px; }
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+}
+.stat {
+    background: var(--card-bg); padding: 14px;
+    border-radius: 8px; text-align: center;
+    border: 1px solid var(--border);
+}
+.stat .value { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat .label { font-size: 0.78em; color: var(--text-light); margin-top: 4px; }
+.badge {
+    display: inline-block; padding: 4px 10px;
+    border-radius: 20px; font-size: 0.8em; font-weight: 700;
+}
+.badge.ok { background: #d4edda; color: #155724; }
+.badge.warn { background: #fff3cd; color: #856404; }
+.badge.error { background: #f8d7da; color: #721c24; }
+.badge.info { background: #d1ecf1; color: #0c5460; }
+.actions {
+    padding: 18px 30px; background: var(--table-header); text-align: center;
+}
+.empty-msg {
+    text-align: center; color: var(--text-light);
+    padding: 20px; font-style: italic;
+}
+.canvas-container, .svg-container {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px; overflow-x: auto;
+}
+.svg-container svg { display: block; margin: 0 auto; max-width: 100%; }
+.info-tip {
+    background: var(--table-header); border-left: 3px solid var(--accent);
+    padding: 10px 14px; border-radius: 5px;
+    font-size: 0.83em; margin-top: 10px; color: var(--text-light);
+}
+.marca-badge {
+    display: inline-block; padding: 3px 8px;
+    border-radius: 12px; font-size: 0.75em;
+    font-weight: 700; background: var(--accent); color: white;
+}
+.modal {
+    display: none; position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); z-index: 1000;
+    justify-content: center; align-items: center;
+}
+.modal.active { display: flex; }
+.modal-content {
+    background: var(--card-bg); color: var(--text);
+    padding: 25px; border-radius: 12px;
+    max-width: 700px; width: 90%; max-height: 85vh;
+    overflow-y: auto;
+}
+.modal-content h3 { margin-bottom: 15px; }
+.modal-content textarea {
+    width: 100%; height: 200px; padding: 10px;
+    font-family: monospace; font-size: 0.8em;
+    background: var(--input-bg); color: var(--text);
+    border: 2px solid var(--input-border); border-radius: 8px;
+}
+.tabs {
+    display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.tab {
+    padding: 8px 14px; background: var(--table-header);
+    border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; font-size: 0.85em; color: var(--text);
+}
+.tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* PLANO EDITOR */
+.plano-toolbar {
+    display: flex; gap: 8px; margin-bottom: 10px;
+    padding: 10px; background: var(--table-header);
+    border-radius: 8px; flex-wrap: wrap; align-items: center;
+}
+.plano-toolbar button {
+    padding: 6px 12px; font-size: 0.82em; margin: 0;
+}
+.plano-toolbar button.active {
+    background: #27ae60; box-shadow: 0 0 0 2px rgba(39,174,96,0.4);
+}
+.plano-editor-wrap {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 8px; overflow: auto; max-height: 700px;
+    position: relative;
+}
+#planoCanvas {
+    display: block; cursor: crosshair;
+    background: #fafafa;
+}
+body.dark #planoCanvas { background: #2a2a3e; }
+.plano-info {
+    display: flex; gap: 15px; margin-top: 10px; padding: 10px;
+    background: var(--table-header); border-radius: 8px;
+    font-size: 0.85em; flex-wrap: wrap;
+}
+.plano-info span { color: var(--text-light); }
+.plano-info strong { color: var(--text); }
+.elemento-seleccionado {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--card-bg); border: 2px solid var(--accent);
+    border-radius: 8px; padding: 12px 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-size: 0.85em; z-index: 500; min-width: 220px;
+}
+.elemento-seleccionado h4 { margin-bottom: 8px; font-size: 0.95em; }
+.elemento-seleccionado input, .elemento-seleccionado select {
+    margin-bottom: 6px; padding: 5px 8px; font-size: 0.85em;
+}
+.elemento-seleccionado button { padding: 5px 10px; font-size: 0.8em; margin: 2px; }
+
+/* TABLERO CARD */
+.tablero-card {
+    background: var(--card-bg); border: 2px solid var(--border);
+    border-radius: 8px; padding: 15px; margin-bottom: 12px;
+}
+.tablero-card h4 {
+    color: var(--text); font-size: 0.95em;
+    margin-bottom: 10px; padding-bottom: 5px;
+    border-bottom: 2px solid var(--accent);
+}
+.tablero-card .form-row { margin-bottom: 8px; }
+
+/* INPUT BOCAS EDITABLE */
+.bocas-input-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.bocas-input-wrap input {
+    width: 60px; padding: 3px; text-align: center;
+    font-weight: 700;
+}
+.bocas-min {
+    font-size: 0.72em; color: var(--text-light); font-weight: 400;
+}
+.bocas-badge-extra {
+    display: inline-block;
+    background: #3498db; color: white;
+    font-size: 0.68em; font-weight: 700;
+    padding: 1px 5px; border-radius: 8px;
+    margin-left: 3px;
+}
+
+/* INSTALL BANNER */
+#installBanner {
+    display: none;
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 0.9em;
+}
+#installBanner button {
+    background: white;
+    color: #27ae60;
+    font-weight: 700;
+    padding: 6px 14px;
+    margin-left: 10px;
+}
+
+/* ===== CORRECCIÓN DE LAYOUT ===== */
+.header-right button,
+.header-right .proyecto-selector,
+.header-left .proyecto-selector {
+    width: auto;
+    max-width: none;
+}
+.header-right button {
+    flex: 0 0 auto;
+}
+@media (max-width: 900px) {
+    .header-right {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .header-right button,
+    .header-right .proyecto-selector,
+    .header-left .proyecto-selector {
+        width: auto;
+        flex: 0 0 auto;
+    }
+    .proyecto-selector { max-width: 100%; }
+}
+
+.step {
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border);
+}
+.step h2 {
+    font-size: 1.05em;
+    color: var(--text);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+}
+.form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+.form-row .form-group { flex: 1 1 180px; min-width: 0; }
+.form-group { display: flex; flex-direction: column; }
+.form-group button { margin-top: auto; }
+
+@media (max-width: 700px) {
+    .form-row { flex-direction: column; }
+    header h1 { font-size: 1.2em; }
+    .stat .value { font-size: 1.2em; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <header>
+    <div class="header-left">
+        <select class="proyecto-selector" id="selectorProyecto" onchange="cambiarProyecto(this.value)">
+            <option value="">-- Proyectos --</option>
+        </select>
+    </div>
+    <div class="header-center">
+        <h1>⚡ AEA 770 - Suite v8</h1>
+        <p>100% offline · PWA instalable · Sin dependencias externas</p>
+    </div>
+    <div class="header-right">
+        <button onclick="nuevoProyecto()">➕ Nuevo</button>
+        <button onclick="guardarProyecto()">💾 Guardar</button>
+        <button onclick="document.getElementById('inputFileJSON').click()">📁 Importar</button>
+        <button onclick="abrirModalJSON('exportar')">📤 JSON</button>
+        <button onclick="abrirModalJSON('importar')">📥 Pegar</button>
+        <button onclick="abrirRepartoTableros()" title="Reparto de circuitos por tablero">🔀 Reparto</button>
+        <button onclick="toggleTema()">🌙</button>
+    </div>
+    <input type="file" id="inputFileJSON" accept=".json" style="display:none;" onchange="importarArchivoJSON(this)">
+    </header>
+
+    <div id="installBanner">
+        📲 Instalá esta app en tu dispositivo para usarla sin conexión.
+        <button onclick="instalarPWA()">Instalar</button>
+        <button onclick="cerrarBanner()" style="background: rgba(255,255,255,0.2); color: white;">✖</button>
+    </div>
+
+    <!-- PASO 1 -->
+    <div class="step">
+        <h2>Paso 1: Datos Generales</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nombre del Proyecto</label>
+                <input type="text" id="nombreProyecto" value="Mi Vivienda">
+            </div>
+            <div class="form-group">
+                <label>Superficie Cubierta (m²)</label>
+                <input type="number" id="supCubierta" value="94" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Superficie Semicubierta (m²)</label>
+                <input type="number" id="supSemicubierta" value="4" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Sla (m²)</label>
+                <input type="text" id="slaResult" readonly>
+            </div>
+            <div class="form-group">
+                <label>Grado Electrificación</label>
+                <input type="text" id="gradoResult" readonly>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Marca de Interruptores</label>
+                <select id="marcaInterruptores" onchange="renderizarTodo()">
+                    <option value="Schneider">Schneider Electric (Acti9)</option>
+                    <option value="Siemens">Siemens (5SL / Betagard)</option>
+                    <option value="ABB">ABB (System pro M compact)</option>
+                    <option value="Legrand">Legrand (DX³)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Icc Presunta en Origen (kA)</label>
+                <input type="number" id="iccOrigen" value="4.5" min="0.5" max="10" step="0.1">
+            </div>
+        </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="step">
+        <h2>Paso 2: Agregar Ambientes</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="nuevoNombre" placeholder="Ej: Dormitorio 4">
+            </div>
+            <div class="form-group">
+                <label>Tipo</label>
+                <select id="nuevoTipo">
+                    <option value="Habitación">Sala / Estar / Comedor</option>
+                    <option value="Dormitorio">Dormitorio</option>
+                    <option value="Cocina">Cocina</option>
+                    <option value="Baño">Baño / Toilette</option>
+                    <option value="Pasillo">Pasillo</option>
+                    <option value="Vestíbulo">Vestíbulo / Hall / Garage</option>
+                    <option value="Lavadero">Lavadero</option>
+                    <option value="Balcón">Balcón / Galería</option>
+                    <option value="Kitchenette">Kitchenette</option>
+                    <option value="Depósito">Depósito</option>
+                    <option value="Cuarto Técnico">Cuarto de Máquinas</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Superficie (m²)</label>
+                <input type="number" id="nuevoArea" placeholder="Ej: 12" min="0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Tablero</label>
+                <select id="nuevoTablero"></select>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;">
+                <button onclick="agregarAmbiente()" class="success">➕ Agregar</button>
+            </div>
+        </div>
+
+        <div class="info-tip" style="margin-bottom:8px;">
+            💡 <strong>Los valores de bocas son editables.</strong> Se muestra el <em>mínimo normativo</em> arriba de cada input.
+            Podés aumentar los valores según el proyecto, pero el sistema no te dejará bajarlos del mínimo.
+            <br>
+            <button onclick="resetearBocasMinimas()" class="info small" style="margin-top:6px;">🔄 Volver todos a mínimos</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Ambiente</th><th>Tipo</th><th>Superficie</th>
+                    <th>Tablero</th>
+                    <th>IUG<br><small style="font-weight:400;">mín / real</small></th>
+                    <th>TUG<br><small style="font-weight:400;">mín / real</small></th>
+                    <th>TUE<br><small style="font-weight:400;">mín / real</small></th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyAmbientes"></tbody>
+            <tfoot id="tfootAmbientes"></tfoot>
+        </table>
+        <div id="emptyMsg" class="empty-msg">No hay ambientes cargados.</div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="step">
+        <h2>Paso 3: Tableros</h2>
+        <div class="info-tip" style="margin-bottom:12px;">
+            💡 Definí cuántos tableros necesitás (Principal + seccionales). Cada tablero se alimenta desde otro
+            (por defecto desde el Principal) y tiene su propia longitud y sección de línea.
+        </div>
+        <div class="form-row" style="margin-bottom:12px;">
+            <div class="form-group">
+                <label>Nombre del nuevo tablero</label>
+                <input type="text" id="nuevoTableroNombre" placeholder="Ej: Tablero Planta Alta Ala Este">
+            </div>
+            <div class="form-group">
+                <label>Planta / Ubicación</label>
+                <select id="nuevoTableroPlanta">
+                    <option value="PB">Planta Baja</option>
+                    <option value="PA">Planta Alta</option>
+                    <option value="SS">Subsuelo</option>
+                    <option value="EXT">Exterior / Garage</option>
+                    <option value="OTRA">Otra</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Se alimenta desde</label>
+                <select id="nuevoTableroPadre"></select>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;">
+                <button onclick="agregarTablero()" class="success">➕ Agregar Tablero</button>
+            </div>
+        </div>
+        <div id="tablerosContainer"></div>
+    </div>
+
+    <!-- PASO 4 -->
+    <div class="step" id="seccionResultados" style="display:none;">
+        <h2>Paso 4: Resultados</h2>
+        <div class="grid-2">
+            <div class="stat"><div class="value" id="totalIUG">0</div><div class="label">Bocas IUG</div></div>
+            <div class="stat"><div class="value" id="totalTUG">0</div><div class="label">Bocas TUG</div></div>
+            <div class="stat"><div class="value" id="totalTUE">0</div><div class="label">Bocas TUE</div></div>
+            <div class="stat"><div class="value" id="totalCircIUG">0</div><div class="label">Circuitos IUG</div></div>
+            <div class="stat"><div class="value" id="totalCircTUG">0</div><div class="label">Circuitos TUG</div></div>
+            <div class="stat"><div class="value" id="totalCircTUE">0</div><div class="label">Circuitos TUE</div></div>
+        </div>
+
+        <div class="tabs" style="margin-top:20px;">
+            <div class="tab active" onclick="cambiarTab(event, 'tab-dpms')">📊 DPMS</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-icc')">⚡ Cortocircuito</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-circuitos')">🔌 Circuitos</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-motores')">🚀 Motores</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-diferenciales')">🧲 Diferenciales</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-materiales')">📦 Materiales</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-plano')">📐 Plano</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-esquema')">🔧 Esquema</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-verificaciones')">✅ Verificaciones</div>
+        </div>
+
+        <div id="tab-dpms" class="tab-content active">
+            <table>
+                <thead><tr><th>Concepto</th><th>Cantidad</th><th>Pot. Unitaria</th><th>Pot. Total</th></tr></thead>
+                <tbody id="tbodyDPMS"></tbody>
+                <tfoot id="tfootDPMS"></tfoot>
+            </table>
+        </div>
+
+        <div id="tab-icc" class="tab-content">
+            <table>
+                <thead>
+                    <tr><th>Punto</th><th>Icc Arriba (kA)</th><th>Longitud (m)</th><th>Sección</th><th>Icc Abajo (kA)</th><th>PdC Auto</th></tr>
+                </thead>
+                <tbody id="tbodyIcc"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-circuitos" class="tab-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Circuito</th><th>Tablero</th><th>Tipo</th><th>Bocas</th><th>DPMS</th>
+                        <th>Secc.</th><th>Prot.</th><th>Long.</th><th>ΔU (%)</th><th>Icc Abajo</th><th>PdC</th><th>Verif.</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyCircuitos"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-motores" class="tab-content">
+            <div class="info-tip" style="margin-bottom:12px;">
+                🚀 <strong>Arranque de motores:</strong> La caída de tensión durante el arranque no debe superar el 15% según AEA 770.
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Circuito TUE</th><th>Potencia (W)</th><th>Corriente Nominal (A)</th>
+                        <th>Corriente Arranque (A)</th><th>Longitud (m)</th><th>Sección (mm²)</th>
+                        <th>ΔU Régimen (%)</th><th>ΔU Arranque (%)</th><th>Verif.</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyMotores"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-diferenciales" class="tab-content">
+            <div id="seccionDiferenciales"></div>
+        </div>
+
+        <div id="tab-materiales" class="tab-content">
+            <div class="form-row" style="margin-bottom:10px;">
+                <div class="form-group">
+                    <label>Tipo de Instalación</label>
+                    <select id="tipoInstalacion" onchange="renderizarTodo()">
+                        <option value="embutida">Embutida en cañería</option>
+                        <option value="vista">A la vista (cablecanal)</option>
+                        <option value="mixta">Mixta</option>
+                    </select>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Categoría</th><th>Descripción</th><th>Cantidad</th><th>Unidad</th><th>Notas</th></tr>
+                </thead>
+                <tbody id="tbodyMateriales"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-plano" class="tab-content">
+            <div class="plano-toolbar">
+                <strong style="margin-right:10px;">Herramienta:</strong>
+                <button onclick="setHerramienta('select')" id="btnSelect" class="active small">🖱️ Seleccionar</button>
+                <button onclick="setHerramienta('boca_iug')" id="btnIUG" class="small">💡 Boca IUG</button>
+                <button onclick="setHerramienta('boca_tug')" id="btnTUG" class="small">🔌 Boca TUG</button>
+                <button onclick="setHerramienta('boca_tue')" id="btnTUE" class="small">⚡ Boca TUE</button>
+                <button onclick="setHerramienta('tablero')" id="btnTablero" class="small">📋 Tablero</button>
+                <button onclick="setHerramienta('borrar')" id="btnBorrar" class="small danger">🗑️ Borrar</button>
+                <span style="flex:1;"></span>
+                <button onclick="limpiarPlano()" class="danger small">🔄 Limpiar Plano</button>
+                <button onclick="exportarPlanoPNG()" class="export small">🖼️ Exportar PNG</button>
+            </div>
+            <div class="plano-toolbar" style="background:transparent;padding:5px 0;">
+                <label style="margin-right:8px;">Ancho (m): <input type="number" id="planoAncho" value="15" min="5" max="50" step="1" style="width:70px;display:inline-block;"></label>
+                <label style="margin-right:8px;">Alto (m): <input type="number" id="planoAlto" value="12" min="5" max="50" step="1" style="width:70px;display:inline-block;"></label>
+                <button onclick="inicializarPlano()" class="info small">📐 Redibujar</button>
+                <span style="flex:1;"></span>
+                <button onclick="autoUbicarBocas()" class="success small">✨ Auto-ubicar bocas</button>
+            </div>
+            <div class="plano-editor-wrap">
+                <canvas id="planoCanvas" width="1200" height="800"></canvas>
+            </div>
+            <div class="plano-info">
+                <span>Escala: <strong id="planoEscala">50 px/m</strong></span>
+                <span>Bocas IUG: <strong id="planoIUG">0</strong></span>
+                <span>Bocas TUG: <strong id="planoTUG">0</strong></span>
+                <span>Bocas TUE: <strong id="planoTUE">0</strong></span>
+                <span>Elementos: <strong id="planoTotal">0</strong></span>
+            </div>
+        </div>
+
+        <div id="tab-esquema" class="tab-content">
+            <div class="svg-container" id="svgContainer"></div>
+        </div>
+
+        <div id="tab-verificaciones" class="tab-content">
+            <div id="verificaciones"></div>
+        </div>
+    </div>
+
+    <!-- PASO 5 -->
+    <div class="actions" id="seccionExportar" style="display:none;">
+        <h2 style="color:var(--text);margin-bottom:12px;">Paso 5: Exportar</h2>
+        <button class="export" onclick="exportarExcel()">📥 Excel</button>
+        <button class="export" onclick="exportarPDF()">📄 PDF</button>
+        <button class="info" onclick="exportarJSON()">📤 JSON</button>
+        <button class="info" onclick="abrirRepartoTableros()">🔀 Reparto de Tableros</button>
+        <button class="success" onclick="guardarProyecto()">💾 Guardar</button>
+        <button class="danger" onclick="resetear()">🔄 Reiniciar</button>
+    </div>
+</div>
+
+<div class="modal" id="modalJSON">
+    <div class="modal-content">
+        <h3 id="modalJSONTitulo">Exportar / Importar JSON</h3>
+        <textarea id="modalJSONTexto" placeholder="Pegá aquí el JSON..."></textarea>
+        <div style="margin-top:15px;text-align:right;">
+            <button onclick="cerrarModalJSON()">Cerrar</button>
+            <button id="modalJSONAccion" class="success" onclick="ejecutarAccionJSON()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<div id="panelElemento" class="elemento-seleccionado" style="display:none;"></div>
+
+<script>
+// ============================================================
+// PWA - SERVICE WORKER + INSTALACIÓN
+// ============================================================
+let deferredPrompt = null;
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('✅ Service Worker registrado:', reg.scope);
+        }).catch(err => {
+            console.log('⚠️ Service Worker no disponible:', err.message);
+        });
+    });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'block';
+});
+
+function instalarPWA() {
+    if (!deferredPrompt) {
+        mostrarToast('ℹ️ Ya instalada o no soportado por el navegador');
+        return;
+    }
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choice) => {
+        if (choice.outcome === 'accepted') {
+            mostrarToast('📲 App instalada correctamente');
+        }
+        deferredPrompt = null;
+        cerrarBanner();
+    });
+}
+
+function cerrarBanner() {
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'none';
+}
+
+window.addEventListener('appinstalled', () => {
+    mostrarToast('✅ App instalada');
+    cerrarBanner();
+});
+
+if (window.matchMedia('(display-mode: standalone)').matches) {
+    cerrarBanner();
+}
+
+// ============================================================
+// CATÁLOGO
+// ============================================================
+const CATALOGO_MARCAS = {
+    'Schneider': {
+        'PIA_IUG': 'Acti9 iC60N 1P+N C10A {pdc}kA',
+        'PIA_TUG': 'Acti9 iC60N 1P+N C16A {pdc}kA',
+        'PIA_TUE': 'Acti9 iC60N 1P+N C20A {pdc}kA',
+        'ID_30mA': 'Acti9 iID 2P 40A 30mA Clase AC',
+        'ID_300mA': 'Acti9 iID 2P 40A 300mA Selectivo Clase S',
+        'ID_BAÑO': 'Acti9 iID 2P 25A 30mA Clase AC'
+    },
+    'Siemens': {
+        'PIA_IUG': 'Betagard 5SL6 1P+N C10A {pdc}kA',
+        'PIA_TUG': 'Betagard 5SL6 1P+N C16A {pdc}kA',
+        'PIA_TUE': 'Betagard 5SL6 1P+N C20A {pdc}kA',
+        'ID_30mA': '5SM3 2P 40A 30mA Clase AC',
+        'ID_300mA': '5SM3 2P 40A 300mA Selectivo Clase S',
+        'ID_BAÑO': '5SM3 2P 25A 30mA Clase AC'
+    },
+    'ABB': {
+        'PIA_IUG': 'System pro M S201 C10A {pdc}kA',
+        'PIA_TUG': 'System pro M S201 C16A {pdc}kA',
+        'PIA_TUE': 'System pro M S201 C20A {pdc}kA',
+        'ID_30mA': 'F200 2P 40A 30mA Clase AC',
+        'ID_300mA': 'F200 2P 40A 300mA Selectivo Clase S',
+        'ID_BAÑO': 'F200 2P 25A 30mA Clase AC'
+    },
+    'Legrand': {
+        'PIA_IUG': 'DX³ 1P+N C10A {pdc}kA',
+        'PIA_TUG': 'DX³ 1P+N C16A {pdc}kA',
+        'PIA_TUE': 'DX³ 1P+N C20A {pdc}kA',
+        'ID_30mA': 'DX³ ID 2P 40A 30mA Clase AC',
+        'ID_300mA': 'DX³ ID 2P 40A 300mA Selectivo Clase S',
+        'ID_BAÑO': 'DX³ ID 2P 25A 30mA Clase AC'
+    }
+};
+
+const PDC_COMERCIALES = [3, 4.5, 6, 10];
+const GDC = { 1.5: 26, 2.5: 15, 4: 10, 6: 6.5, 10: 3.8, 16: 2.4, 25: 1.5, 35: 1.05, 50: 0.75 };
+const ESCALA_PLANO = 50;
+
+// ============================================================
+// ESTADO GLOBAL
+// ============================================================
+let ambientes = [];
+let circuitosPorTablero = {};
+let tableros = [
+    { id: 'Principal', nombre: 'Tablero Principal', planta: 'PB', long: 0, seccion: 4, iccArriba: 4.5, padre: null }
+];
+let contadorTableros = 1;
+let planoElementos = [];
+let herramientaActual = 'select';
+let elementoSeleccionado = null;
+let modoOscuro = false;
+let proyectoActualId = null;
+let arrastrando = null;
+let offsetX = 0, offsetY = 0;
+
+// ============================================================
+// CÁLCULOS NORMATIVOS
+// ============================================================
+function calcularSla() {
+    const c = parseFloat(document.getElementById('supCubierta').value) || 0;
+    const s = parseFloat(document.getElementById('supSemicubierta').value) || 0;
+    return c + (s * 0.5);
+}
+
+function calcularGrado(sla) {
+    if (sla <= 60) return 'MÍNIMO';
+    if (sla <= 130) return 'MEDIO';
+    if (sla <= 200) return 'ELEVADO';
+    return 'SUPERIOR';
+}
+
+function calcularBocasMinimas(ambiente) {
+    const { tipo, area } = ambiente;
+    let iug = 0, tug = 0, tue = 0;
+    switch(tipo) {
+        case 'Habitación':
+            iug = Math.max(1, Math.ceil(area / 18));
+            tug = Math.max(2, Math.ceil(area / 6));
+            break;
+        case 'Dormitorio':
+            iug = 1;
+            if (area < 10) tug = 2;
+            else if (area <= 36) tug = 3;
+            else { tug = 3; tue = 1; }
+            break;
+        case 'Cocina': iug = 2; tug = 3; break;
+        case 'Baño': iug = 1; tug = 1; break;
+        case 'Pasillo':
+            iug = Math.max(1, Math.ceil(area / 5));
+            tug = area > 2 ? Math.max(1, Math.ceil(area / 5)) : 0;
+            break;
+        case 'Vestíbulo': iug = 1; tug = Math.max(1, Math.ceil(area / 12)); break;
+        case 'Lavadero': iug = 1; tug = 2; break;
+        case 'Balcón': iug = Math.max(1, Math.ceil(area / 5)); break;
+        case 'Kitchenette': iug = 1; tug = 2; break;
+        case 'Depósito':
+            iug = Math.max(1, Math.ceil(area / 15));
+            tug = Math.max(1, Math.ceil(area / 9));
+            break;
+        case 'Cuarto Técnico': iug = 1; tug = 1; tue = 1; break;
+    }
+    return { iug, tug, tue };
+}
+
+function calcularBocas(ambiente) {
+    const min = calcularBocasMinimas(ambiente);
+    return {
+        iug: (ambiente.iugReal !== undefined && ambiente.iugReal !== null) ? ambiente.iugReal : min.iug,
+        tug: (ambiente.tugReal !== undefined && ambiente.tugReal !== null) ? ambiente.tugReal : min.tug,
+        tue: (ambiente.tueReal !== undefined && ambiente.tueReal !== null) ? ambiente.tueReal : min.tue,
+        minIUG: min.iug,
+        minTUG: min.tug,
+        minTUE: min.tue
+    };
+}
+
+function calcularCaidaTension(corriente, longitud, seccion, tipo) {
+    const gdc = GDC[seccion] || 15;
+    const deltaU = gdc * corriente * (longitud / 1000);
+    const tension = tipo === 'TUE' ? 380 : 220;
+    return (deltaU / tension) * 100;
+}
+
+function calcularIccAguasAbajo(iccArriba, longitud, seccion) {
+    if (longitud === 0) return iccArriba;
+    const factores = { 1.5: 0.035, 2.5: 0.025, 4: 0.018, 6: 0.013, 10: 0.009, 16: 0.006, 25: 0.004, 35: 0.003, 50: 0.002 };
+    const factor = factores[seccion] || 0.02;
+    const reduccion = 1 / (1 + factor * longitud * (iccArriba / 4.5));
+    return Math.max(0.5, iccArriba * reduccion);
+}
+
+function pdcComercial(icc) {
+    for (const p of PDC_COMERCIALES) if (p >= icc) return p;
+    return PDC_COMERCIALES[PDC_COMERCIALES.length - 1];
+}
+
+function calcularArranqueMotor(potenciaW, longitud, seccion, tipoArranque) {
+    tipoArranque = tipoArranque || 'directo';
+    const corrienteNominal = potenciaW / (1.73 * 380 * 0.85);
+    const factorArranque = tipoArranque === 'directo' ? 6 : tipoArranque === 'estrella-triangulo' ? 2.5 : 3;
+    const corrienteArranque = corrienteNominal * factorArranque;
+    const gdcNominal = GDC[seccion] || 15;
+    const gdcArranque = gdcNominal * 1.6;
+    const deltaU_arranque = gdcArranque * corrienteArranque * (longitud / 1000);
+    const caidaArranque = (deltaU_arranque / 380) * 100;
+    const deltaU_nominal = gdcNominal * corrienteNominal * (longitud / 1000);
+    const caidaNominal = (deltaU_nominal / 380) * 100;
+    return { corrienteNominal, corrienteArranque, factorArranque, caidaNominal, caidaArranque };
+}
+
+// ============================================================
+// GESTIÓN DE AMBIENTES
+// ============================================================
+function agregarAmbiente() {
+    const nombre = document.getElementById('nuevoNombre').value.trim();
+    const tipo = document.getElementById('nuevoTipo').value;
+    const area = parseFloat(document.getElementById('nuevoArea').value);
+    const tablero = document.getElementById('nuevoTablero').value;
+
+    if (!nombre) { alert('Ingresá un nombre.'); return; }
+    if (!area || area <= 0) { alert('Ingresá una superficie válida.'); return; }
+
+    if (tableros.length < 2) {
+        alert('⚠️ Creá el tablero adicional primero.\n\n' +
+              'Para asignar este ambiente a otro tablero, andá al Paso 3: Tableros ' +
+              'y agregá al menos un tablero seccional.');
+        return;
+    }
+
+    if (!tablero) { alert('Seleccioná un tablero.'); return; }
+    ambientes.push({ nombre, tipo, area, tablero });
+    document.getElementById('nuevoNombre').value = '';
+    document.getElementById('nuevoArea').value = '';
+    renderizarTodo();
+}
+
+function eliminarAmbiente(index) {
+    ambientes.splice(index, 1);
+    renderizarTodo();
+}
+
+function actualizarBocas(index, campo, valor) {
+    const amb = ambientes[index];
+    if (!amb) return;
+    const min = calcularBocasMinimas(amb);
+    const num = parseInt(valor) || 0;
+    const minimo = min[campo];
+    if (num < minimo) {
+        alert('⚠️ El valor mínimo normativo para ' + campo.toUpperCase() + ' es ' + minimo + '.\nSe ajustó automáticamente.');
+        amb[campo + 'Real'] = minimo;
+    } else {
+        amb[campo + 'Real'] = num;
+    }
+    renderizarTodo();
+}
+
+// ============================================================
+// CAMBIO DE TABLERO DE UN AMBIENTE
+// ============================================================
+function opcionesTablerosAmbiente(seleccionado) {
+    return tableros.map(t =>
+        `<option value="${t.id}" ${t.id === seleccionado ? 'selected' : ''}>${t.nombre}</option>`
+    ).join('');
+}
+
+function cambiarTableroAmbiente(index, nuevoTableroId) {
+    const amb = ambientes[index];
+    if (!amb) return;
+
+    if (tableros.length < 2) {
+        alert('⚠️ Creá el tablero adicional primero.\n\n' +
+              'Para asignar ambientes a otro tablero, andá al Paso 3: Tableros ' +
+              'y agregá al menos un tablero seccional.');
+        renderizarTodo();
+        return;
+    }
+
+    if (!tableros.find(t => t.id === nuevoTableroId)) return;
+    amb.tablero = nuevoTableroId;
+    renderizarTodo();
+}
+
+function resetearBocasMinimas() {
+    if (ambientes.length === 0) { mostrarToast('⚠️ No hay ambientes cargados'); return; }
+    if (!confirm('¿Volver todos los valores de bocas a los mínimos normativos?\nSe perderán los ajustes manuales.')) return;
+    ambientes.forEach(amb => {
+        delete amb.iugReal;
+        delete amb.tugReal;
+        delete amb.tueReal;
+    });
+    renderizarTodo();
+    mostrarToast('✅ Valores reseteados a los mínimos normativos');
+}
+
+function toggleTema() {
+    modoOscuro = !modoOscuro;
+    document.body.classList.toggle('dark', modoOscuro);
+    const btns = document.querySelectorAll('.header-right button');
+    if (btns.length > 0) btns[btns.length - 1].textContent = modoOscuro ? '☀️' : '🌙';
+    if (planoElementos.length > 0) dibujarPlano();
+}
+
+function cambiarTab(evt, tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    evt.target.classList.add('active');
+    const tab = document.getElementById(tabId);
+    if (tab) tab.classList.add('active');
+    if (tabId === 'tab-plano') setTimeout(() => { inicializarPlano(); dibujarPlano(); }, 50);
+}
+
+// ============================================================
+// RENDERIZADO PRINCIPAL
+// ============================================================
+function renderizarTodo() {
+    const sla = calcularSla();
+    const grado = calcularGrado(sla);
+    document.getElementById('slaResult').value = sla.toFixed(2) + ' m²';
+    document.getElementById('gradoResult').value = grado;
+
+    const tbody = document.getElementById('tbodyAmbientes');
+    const tfoot = document.getElementById('tfootAmbientes');
+    const emptyMsg = document.getElementById('emptyMsg');
+
+    if (ambientes.length === 0) {
+        tbody.innerHTML = ''; tfoot.innerHTML = '';
+        emptyMsg.style.display = 'block';
+        document.getElementById('seccionResultados').style.display = 'none';
+        document.getElementById('seccionExportar').style.display = 'none';
+        return;
+    }
+    emptyMsg.style.display = 'none';
+
+    let totalIUG = 0, totalTUG = 0, totalTUE = 0;
+
+    tbody.innerHTML = ambientes.map((amb, i) => {
+        const b = calcularBocas(amb);
+        totalIUG += b.iug; totalTUG += b.tug; totalTUE += b.tue;
+
+        const extraIUG = b.iug - b.minIUG;
+        const extraTUG = b.tug - b.minTUG;
+        const extraTUE = b.tue - b.minTUE;
+        const badgeIUG = extraIUG > 0 ? `<span class="bocas-badge-extra">+${extraIUG}</span>` : '';
+        const badgeTUG = extraTUG > 0 ? `<span class="bocas-badge-extra">+${extraTUG}</span>` : '';
+        const badgeTUE = extraTUE > 0 ? `<span class="bocas-badge-extra">+${extraTUE}</span>` : '';
+
+        return `<tr>
+            <td><strong>${amb.nombre}</strong></td>
+            <td>${amb.tipo}</td>
+            <td>${amb.area}</td>
+            <td>
+                <select onchange="cambiarTableroAmbiente(${i}, this.value)"
+                        style="padding:4px 6px;font-size:0.85em;border-radius:6px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);max-width:140px;">
+                    ${opcionesTablerosAmbiente(amb.tablero)}
+                </select>
+            </td>
+            <td>
+                <div class="bocas-input-wrap">
+                    <span class="bocas-min">mín: ${b.minIUG}</span>
+                    <input type="number" min="${b.minIUG}" value="${b.iug}"
+                           onchange="actualizarBocas(${i}, 'iug', this.value)">
+                    ${badgeIUG}
+                </div>
+            </td>
+            <td>
+                <div class="bocas-input-wrap">
+                    <span class="bocas-min">mín: ${b.minTUG}</span>
+                    <input type="number" min="${b.minTUG}" value="${b.tug}"
+                           onchange="actualizarBocas(${i}, 'tug', this.value)">
+                    ${badgeTUG}
+                </div>
+            </td>
+            <td>
+                <div class="bocas-input-wrap">
+                    <span class="bocas-min">mín: ${b.minTUE}</span>
+                    <input type="number" min="${b.minTUE}" value="${b.tue}"
+                           onchange="actualizarBocas(${i}, 'tue', this.value)">
+                    ${badgeTUE}
+                </div>
+            </td>
+            <td><button class="danger small" onclick="eliminarAmbiente(${i})">✖</button></td>
+        </tr>`;
+    }).join('');
+
+    tfoot.innerHTML = `<tr style="background:#2c3e50;color:white;font-weight:700;">
+        <td colspan="4">TOTALES</td>
+        <td>${totalIUG}</td><td>${totalTUG}</td><td>${totalTUE}</td><td></td>
+    </tr>`;
+
+    document.getElementById('totalIUG').textContent = totalIUG;
+    document.getElementById('totalTUG').textContent = totalTUG;
+    document.getElementById('totalTUE').textContent = totalTUE;
+
+    window.__datosExport = window.__datosExport || {};
+    window.__datosExport.totalIUG = totalIUG;
+    window.__datosExport.totalTUG = totalTUG;
+    window.__datosExport.totalTUE = totalTUE;
+
+    renderizarTableros();
+    renderizarDPMS();
+    renderizarIcc();
+    renderizarCircuitos();
+    renderizarMotores();
+    renderizarDiferenciales();
+    renderizarMateriales();
+    renderizarVerificaciones();
+    dibujarEsquemaSVG();
+
+    document.getElementById('seccionResultados').style.display = 'block';
+    document.getElementById('seccionExportar').style.display = 'block';
+}
+
+// ============================================================
+// TABLEROS
+// ============================================================
+function renderizarTableros() {
+    const container = document.getElementById('tablerosContainer');
+    const iccOrigen = parseFloat(document.getElementById('iccOrigen').value) || 4.5;
+
+    tableros.forEach(t => { t.iccArriba = null; });
+
+    const ordenados = [];
+    const visitados = new Set();
+    const cola = [tableros.find(t => !t.padre) || tableros[0]];
+    while (cola.length > 0) {
+        const t = cola.shift();
+        if (!t || visitados.has(t.id)) continue;
+        visitados.add(t.id);
+        ordenados.push(t);
+        tableros.filter(x => x.padre === t.id).forEach(h => cola.push(h));
+    }
+    tableros.forEach(t => { if (!visitados.has(t.id)) ordenados.push(t); });
+
+    ordenados.forEach(t => {
+        if (!t.padre) {
+            t.iccArriba = iccOrigen;
+        } else {
+            const padre = tableros.find(x => x.id === t.padre);
+            if (padre && padre.iccArriba !== null) {
+                t.iccArriba = calcularIccAguasAbajo(padre.iccArriba, t.long, t.seccion);
+            } else {
+                t.iccArriba = iccOrigen;
+            }
+        }
+    });
+
+    const selPadre = document.getElementById('nuevoTableroPadre');
+    if (selPadre) {
+        const valorActual = selPadre.value;
+        selPadre.innerHTML = tableros.map(t =>
+            `<option value="${t.id}">${t.nombre}</option>`
+        ).join('');
+        const principal = tableros.find(t => !t.padre);
+        if (principal) selPadre.value = principal.id;
+        if (valorActual && tableros.find(t => t.id === valorActual)) selPadre.value = valorActual;
+    }
+
+    container.innerHTML = tableros.map((t, i) => {
+        const esPrincipal = !t.padre;
+        const pdc = t.iccArriba !== null ? pdcComercial(t.iccArriba) : '-';
+        const nombrePlanta = { PB: 'PB', PA: 'PA', SS: 'Subsuelo', EXT: 'Ext.', OTRA: 'Otra' }[t.planta] || t.planta;
+
+        const descendientes = obtenerDescendientes(t.id);
+        const opcionesPadre = tableros
+            .filter(x => x.id !== t.id && !descendientes.includes(x.id))
+            .map(x => `<option value="${x.id}" ${t.padre === x.id ? 'selected' : ''}>${x.nombre}</option>`)
+            .join('');
+
+        return `
+            <div class="tablero-card">
+                <h4>
+                    📋 ${t.nombre}
+                    <span class="marca-badge" style="background:#555;">${nombrePlanta}</span>
+                    ${esPrincipal ? '<span class="marca-badge" style="background:#27ae60;">Origen</span>' : ''}
+                </h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" value="${t.nombre}"
+                               onchange="actualizarTablero(${i}, 'nombre', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Planta</label>
+                        <select onchange="actualizarTablero(${i}, 'planta', this.value)">
+                            <option value="PB" ${t.planta === 'PB' ? 'selected' : ''}>Planta Baja</option>
+                            <option value="PA" ${t.planta === 'PA' ? 'selected' : ''}>Planta Alta</option>
+                            <option value="SS" ${t.planta === 'SS' ? 'selected' : ''}>Subsuelo</option>
+                            <option value="EXT" ${t.planta === 'EXT' ? 'selected' : ''}>Exterior / Garage</option>
+                            <option value="OTRA" ${t.planta === 'OTRA' ? 'selected' : ''}>Otra</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Se alimenta desde</label>
+                        ${esPrincipal
+                            ? '<input type="text" value="Acometida de la distribuidora" readonly>'
+                            : `<select onchange="actualizarTablero(${i}, 'padre', this.value)">${opcionesPadre}</select>`}
+                    </div>
+                    <div class="form-group">
+                        <label>Longitud desde padre (m)</label>
+                        <input type="number" value="${t.long}" min="0" step="1"
+                               ${esPrincipal ? 'disabled' : ''}
+                               onchange="actualizarTablero(${i}, 'long', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Sección de línea (mm²)</label>
+                        <select onchange="actualizarTablero(${i}, 'seccion', this.value)"
+                                ${esPrincipal ? 'disabled' : ''}>
+                            <option value="4" ${t.seccion == 4 ? 'selected' : ''}>4 mm²</option>
+                            <option value="6" ${t.seccion == 6 ? 'selected' : ''}>6 mm²</option>
+                            <option value="10" ${t.seccion == 10 ? 'selected' : ''}>10 mm²</option>
+                            <option value="16" ${t.seccion == 16 ? 'selected' : ''}>16 mm²</option>
+                            <option value="25" ${t.seccion == 25 ? 'selected' : ''}>25 mm²</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Icc Aguas Arriba</label>
+                        <input type="text" value="${t.iccArriba !== null ? t.iccArriba.toFixed(2) + ' kA' : '-'}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>PdC Requerido</label>
+                        <input type="text" value="${pdc}${pdc !== '-' ? ' kA' : ''}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Circuitos</label>
+                        <input type="text" value="${(circuitosPorTablero[t.id] || []).length}" readonly>
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:flex-end;">
+                        ${esPrincipal
+                            ? ''
+                            : `<button class="danger small" onclick="eliminarTablero(${i})">🗑️ Eliminar</button>`}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    poblarSelectorTableros();
+    distribuirCircuitosPorTablero();
+}
+
+function obtenerDescendientes(idTablero) {
+    const hijos = tableros.filter(t => t.padre === idTablero).map(t => t.id);
+    let todos = [...hijos];
+    hijos.forEach(h => { todos = todos.concat(obtenerDescendientes(h)); });
+    return todos;
+}
+
+function agregarTablero() {
+    const nombre = document.getElementById('nuevoTableroNombre').value.trim();
+    const planta = document.getElementById('nuevoTableroPlanta').value;
+    const padre = document.getElementById('nuevoTableroPadre').value;
+
+    if (!nombre) { alert('Ingresá un nombre para el tablero.'); return; }
+    if (!padre) { alert('Seleccioná un tablero padre.'); return; }
+
+    const id = 'T' + (++contadorTableros);
+    tableros.push({ id, nombre, planta, padre, long: 10, seccion: 4, iccArriba: null });
+
+    document.getElementById('nuevoTableroNombre').value = '';
+    renderizarTodo();
+    mostrarToast('✅ Tablero agregado: ' + nombre);
+}
+
+function eliminarTablero(index) {
+    const t = tableros[index];
+    if (!t.padre) { alert('No podés eliminar el tablero principal.'); return; }
+    const principal = tableros.find(x => !x.padre);
+    ambientes.forEach(a => { if (a.tablero === t.id) a.tablero = principal.id; });
+    tableros.forEach(x => { if (x.padre === t.id) x.padre = principal.id; });
+    tableros.splice(index, 1);
+    renderizarTodo();
+    mostrarToast('🗑️ Tablero eliminado');
+}
+
+function actualizarTablero(index, campo, valor) {
+    const t = tableros[index];
+    if (!t) return;
+    if (campo === 'long') t.long = parseFloat(valor) || 0;
+    else if (campo === 'seccion') t.seccion = parseFloat(valor) || 4;
+    else if (campo === 'nombre') t.nombre = valor;
+    else if (campo === 'planta') t.planta = valor;
+    else if (campo === 'padre') {
+        if (valor === t.id) return;
+        const descendientes = obtenerDescendientes(t.id);
+        if (descendientes.includes(valor)) {
+            alert('No podés asignar como padre a un tablero que depende de este.');
+            renderizarTodo();
+            return;
+        }
+        t.padre = valor;
+    }
+    renderizarTodo();
+}
+
+function poblarSelectorTableros() {
+    const sel = document.getElementById('nuevoTablero');
+    if (!sel) return;
+    const valorActual = sel.value;
+    sel.innerHTML = tableros.map(t =>
+        `<option value="${t.id}">${t.nombre} (${t.planta})</option>`
+    ).join('');
+    if (valorActual && tableros.find(t => t.id === valorActual)) sel.value = valorActual;
+}
+
+// ============================================================
+// DISTRIBUCIÓN DE CIRCUITOS
+// ============================================================
+function distribuirCircuitosPorTablero() {
+    circuitosPorTablero = {};
+    tableros.forEach(t => { circuitosPorTablero[t.id] = []; });
+
+    const bocasPorTablero = {};
+    tableros.forEach(t => { bocasPorTablero[t.id] = { iug: 0, tug: 0, tue: 0 }; });
+
+    ambientes.forEach(amb => {
+        if (!bocasPorTablero[amb.tablero]) {
+            const principal = tableros.find(t => !t.padre);
+            if (principal) amb.tablero = principal.id;
+            return;
+        }
+        const b = calcularBocas(amb);
+        bocasPorTablero[amb.tablero].iug += b.iug;
+        bocasPorTablero[amb.tablero].tug += b.tug;
+        bocasPorTablero[amb.tablero].tue += b.tue;
+    });
+
+    let nGlobal = 1;
+    tableros.forEach(t => {
+        const bocas = bocasPorTablero[t.id];
+        const iccSeccional = t.iccArriba;
+
+        let restIUG = bocas.iug;
+        while (restIUG > 0) {
+            const cant = Math.min(restIUG, 15);
+            circuitosPorTablero[t.id].push({
+                nombre: 'C' + nGlobal, tablero: t.id, tipo: 'IUG', bocas: cant,
+                dpms: 440, seccion: 1.5, proteccion: 10, longitud: 10, iccArriba: iccSeccional
+            });
+            restIUG -= cant; nGlobal++;
+        }
+        let restTUG = bocas.tug;
+        while (restTUG > 0) {
+            const cant = Math.min(restTUG, 15);
+            circuitosPorTablero[t.id].push({
+                nombre: 'C' + nGlobal, tablero: t.id, tipo: 'TUG', bocas: cant,
+                dpms: 2200, seccion: 2.5, proteccion: 16, longitud: 15, iccArriba: iccSeccional
+            });
+            restTUG -= cant; nGlobal++;
+        }
+        let restTUE = bocas.tue;
+        while (restTUE > 0) {
+            const cant = Math.min(restTUE, 12);
+            circuitosPorTablero[t.id].push({
+                nombre: 'C' + nGlobal, tablero: t.id, tipo: 'TUE', bocas: cant,
+                dpms: 3300, seccion: 2.5, proteccion: 20, longitud: 20, iccArriba: iccSeccional
+            });
+            restTUE -= cant; nGlobal++;
+        }
+    });
+}
+
+// ============================================================
+// DPMS
+// ============================================================
+function renderizarDPMS() {
+    let totalCircIUG = 0, totalCircTUG = 0, totalCircTUE = 0;
+    Object.values(circuitosPorTablero).forEach(circs => {
+        circs.forEach(c => {
+            if (c.tipo === 'IUG') totalCircIUG++;
+            else if (c.tipo === 'TUG') totalCircTUG++;
+            else if (c.tipo === 'TUE') totalCircTUE++;
+        });
+    });
+
+    document.getElementById('totalCircIUG').textContent = totalCircIUG;
+    document.getElementById('totalCircTUG').textContent = totalCircTUG;
+    document.getElementById('totalCircTUE').textContent = totalCircTUE;
+
+    const potIUG = totalCircIUG * 440;
+    const potTUG = totalCircTUG * 2200;
+    const potTUE = totalCircTUE * 3300;
+    const dpmsTotal = potIUG + potTUG + potTUE;
+
+    const grado = document.getElementById('gradoResult').value;
+    let coefSimult = grado === 'MEDIO' ? 0.9 : grado === 'ELEVADO' ? 0.8 : grado === 'SUPERIOR' ? 0.7 : 1;
+    const dpmsFinal = dpmsTotal * coefSimult;
+
+    document.getElementById('tbodyDPMS').innerHTML = `
+        <tr><td>Circuitos IUG (${totalCircIUG} × 440 VA)</td><td>${totalCircIUG}</td><td>440 VA</td><td>${potIUG.toFixed(0)} VA</td></tr>
+        <tr><td>Circuitos TUG (${totalCircTUG} × 2200 VA)</td><td>${totalCircTUG}</td><td>2200 VA</td><td>${potTUG.toFixed(0)} VA</td></tr>
+        <tr><td>Circuitos TUE (${totalCircTUE} × 3300 VA)</td><td>${totalCircTUE}</td><td>3300 VA</td><td>${potTUE.toFixed(0)} VA</td></tr>
+    `;
+    document.getElementById('tfootDPMS').innerHTML = `
+        <tr style="background:var(--table-header);font-weight:700;"><td colspan="3">DPMS TOTAL</td><td>${dpmsTotal.toFixed(0)} VA</td></tr>
+        <tr style="background:var(--accent);color:white;font-weight:700;"><td colspan="3">DPMS c/ Simultaneidad (${(coefSimult*100).toFixed(0)}%)</td><td>${dpmsFinal.toFixed(0)} VA</td></tr>
+    `;
+
+    window.__datosExport = window.__datosExport || {};
+    Object.assign(window.__datosExport, {
+        totalCircIUG, totalCircTUG, totalCircTUE,
+        potIUG, potTUG, potTUE, dpmsTotal, dpmsFinal, coefSimult
+    });
+}
+
+// ============================================================
+// CORTOCIRCUITO
+// ============================================================
+function renderizarIcc() {
+    const tbody = document.getElementById('tbodyIcc');
+    tbody.innerHTML = tableros.map((t, i) => {
+        const pdc = pdcComercial(t.iccArriba);
+        return `<tr>
+            <td><strong>${t.nombre}</strong></td>
+            <td>${!t.padre ? '-' : t.iccArriba.toFixed(2)}</td>
+            <td>${t.long}</td>
+            <td>${!t.padre ? '-' : t.seccion}</td>
+            <td>${t.iccArriba.toFixed(2)}</td>
+            <td><span class="marca-badge">${pdc} kA</span></td>
+        </tr>`;
+    }).join('');
+}
+
+// ============================================================
+// CIRCUITOS
+// ============================================================
+function renderizarCircuitos() {
+    const tbody = document.getElementById('tbodyCircuitos');
+    let html = '';
+    Object.keys(circuitosPorTablero).forEach(tableroId => {
+        circuitosPorTablero[tableroId].forEach((c, idx) => {
+            const caida = calcularCaidaTension(c.dpms / 220, c.longitud, c.seccion, c.tipo);
+            const limite = c.tipo === 'IUG' ? 3 : 5;
+            const iccAbajo = calcularIccAguasAbajo(c.iccArriba, c.longitud, c.seccion);
+            const pdc = pdcComercial(iccAbajo);
+            const verif = caida <= limite ? '<span class="badge ok">✔</span>' : '<span class="badge error">✖</span>';
+            const tabNombre = (tableros.find(t => t.id === c.tablero) || {nombre: c.tablero}).nombre;
+            html += `<tr>
+                <td><strong>${c.nombre}</strong></td>
+                <td><span class="marca-badge">${tabNombre}</span></td>
+                <td>${c.tipo}</td><td>${c.bocas}</td><td>${c.dpms}</td>
+                <td>${c.seccion}</td><td>${c.proteccion}</td>
+                <td><input type="number" min="1" step="1" value="${c.longitud}"
+                           style="width:65px;padding:3px;"
+                           onchange="actualizarLongitudCircuito('${tableroId}', ${idx}, this.value)"></td>
+                <td>${caida.toFixed(2)}%</td>
+                <td>${iccAbajo.toFixed(2)} kA</td>
+                <td><span class="marca-badge">${pdc} kA</span></td>
+                <td>${verif}</td>
+            </tr>`;
+        });
+    });
+    tbody.innerHTML = html || '<tr><td colspan="12" class="empty-msg">Sin circuitos</td></tr>';
+}
+
+function actualizarLongitudCircuito(tableroId, idx, valor) {
+    circuitosPorTablero[tableroId][idx].longitud = parseFloat(valor) || 1;
+    renderizarCircuitos();
+    renderizarMotores();
+    renderizarMateriales();
+    dibujarEsquemaSVG();
+}
+
+// ============================================================
+// MOTORES
+// ============================================================
+function renderizarMotores() {
+    const tbody = document.getElementById('tbodyMotores');
+    const tues = [];
+    Object.keys(circuitosPorTablero).forEach(tid => {
+        circuitosPorTablero[tid].forEach((c, idx) => {
+            if (c.tipo === 'TUE') tues.push({ ...c, tableroId: tid, idx });
+        });
+    });
+    if (tues.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-msg">No hay circuitos TUE.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = tues.map(t => {
+        const potencia = 2800;
+        const r = calcularArranqueMotor(potencia, t.longitud, t.seccion, 'directo');
+        const vReg = r.caidaNominal <= 5 ? `<span class="badge ok">✔ ${r.caidaNominal.toFixed(2)}%</span>` : `<span class="badge error">✖ ${r.caidaNominal.toFixed(2)}%</span>`;
+        const vArr = r.caidaArranque <= 15 ? `<span class="badge ok">✔ ${r.caidaArranque.toFixed(2)}%</span>` : `<span class="badge error">✖ ${r.caidaArranque.toFixed(2)}%</span>`;
+        const tabNombre = (tableros.find(x => x.id === t.tableroId) || {nombre: t.tableroId}).nombre;
+        return `<tr>
+            <td><strong>${t.nombre}</strong> <span class="marca-badge">${tabNombre}</span></td>
+            <td>${potencia} W</td>
+            <td>${r.corrienteNominal.toFixed(2)} A</td>
+            <td>${r.corrienteArranque.toFixed(2)} A (×${r.factorArranque})</td>
+            <td>${t.longitud}</td>
+            <td>${t.seccion}</td>
+            <td>${vReg}</td>
+            <td>${vArr}</td>
+            <td>${r.caidaArranque <= 15 ? '✔' : '✖'}</td>
+        </tr>`;
+    }).join('');
+}
+
+// ============================================================
+// DIFERENCIALES
+// ============================================================
+function renderizarDiferenciales() {
+    const seccion = document.getElementById('seccionDiferenciales');
+    const marca = document.getElementById('marcaInterruptores').value;
+    const cat = CATALOGO_MARCAS[marca] || CATALOGO_MARCAS['Schneider'];
+    const corrienteTotal = (window.__datosExport?.dpmsFinal || 0) / 220;
+    const tieneBaño = ambientes.some(a => a.tipo === 'Baño');
+    const tieneSeccionales = tableros.length > 1;
+
+    let html = `
+        <div style="margin-bottom:10px;"><strong>Corriente total estimada:</strong> ${corrienteTotal.toFixed(2)} A</div>
+        <table>
+            <thead><tr><th>Ubicación</th><th>Tipo</th><th>Sensibilidad</th><th>Corriente</th><th>Modelo</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>Cabecera del Tablero Principal</td>
+                    <td>ID Selectivo (Clase S)</td><td>300 mA</td>
+                    <td>${Math.max(40, Math.ceil(corrienteTotal * 1.25 / 5) * 5)} A</td>
+                    <td><span class="marca-badge">${cat.ID_300mA}</span></td>
+                </tr>
+                <tr>
+                    <td>Circuitos TUG (agrupados)</td><td>ID 30 mA</td><td>30 mA</td><td>40 A</td>
+                    <td><span class="marca-badge">${cat.ID_30mA}</span></td>
+                </tr>
+                <tr>
+                    <td>Circuito TUE (motores)</td><td>ID 30 mA</td><td>30 mA</td><td>25 A</td>
+                    <td><span class="marca-badge">${cat.ID_30mA}</span></td>
+                </tr>`;
+    if (tieneBaño) {
+        html += `<tr style="background:#fff3cd;">
+            <td>Circuito(s) de Baño (Sección 701)</td>
+            <td>ID 30 mA exclusivo</td><td>30 mA</td><td>25 A</td>
+            <td><span class="marca-badge">${cat.ID_BAÑO}</span></td>
+        </tr>`;
+    }
+    if (tieneSeccionales) {
+        tableros.slice(1).forEach(t => {
+            html += `<tr style="background:#d1ecf1;">
+                <td>Cabecera ${t.nombre}</td>
+                <td>ID 30 mA o 300 mA Selectivo</td><td>30 mA / 300 mA</td><td>40 A</td>
+                <td><span class="marca-badge">${cat.ID_30mA}</span></td>
+            </tr>`;
+        });
+    }
+    html += `</tbody></table>
+        <div class="info-tip">
+            💡 <strong>Selectividad:</strong> El ID de cabecera (300 mA selectivo) debe estar coordinado con los ID de 30 mA aguas abajo.
+            ${tieneBaño ? 'En baños, el ID debe ser <strong>exclusivo</strong> según Sección 701.' : ''}
+            ${tieneSeccionales ? 'Cada tablero seccional debe tener su propia protección diferencial.' : ''}
+        </div>`;
+    seccion.innerHTML = html;
+}
+
+// ============================================================
+// MATERIALES
+// ============================================================
+function renderizarMateriales() {
+    const tbody = document.getElementById('tbodyMateriales');
+    const marca = document.getElementById('marcaInterruptores').value;
+    const cat = CATALOGO_MARCAS[marca] || CATALOGO_MARCAS['Schneider'];
+    const tipoInst = document.getElementById('tipoInstalacion').value;
+
+    const materiales = [];
+    materiales.push(['Tableros', 'Gabinete doble aislación Clase II con riel DIN', tableros.length, 'unidad', 'Uno por tablero']);
+
+    const contadores = {};
+    Object.values(circuitosPorTablero).forEach(circs => {
+        circs.forEach(c => {
+            const key = `${c.tipo}_${c.seccion}_${c.proteccion}`;
+            if (!contadores[key]) contadores[key] = { tipo: c.tipo, seccion: c.seccion, proteccion: c.proteccion, cantidad: 0 };
+            contadores[key].cantidad++;
+        });
+    });
+    Object.values(contadores).forEach(c => {
+        const modelo = (cat['PIA_' + c.tipo] || '').replace('{pdc}', pdcComercial(4.5));
+        materiales.push(['Protecciones', `PIA ${c.proteccion}A ${c.seccion}mm² - ${modelo}`, c.cantidad, 'unidad', `Circuitos ${c.tipo}`]);
+    });
+
+    materiales.push(['Diferenciales', cat.ID_300mA, 1, 'unidad', 'Cabecera Principal']);
+    materiales.push(['Diferenciales', cat.ID_30mA, 2, 'unidad', 'TUG + TUE']);
+    if (ambientes.some(a => a.tipo === 'Baño')) materiales.push(['Diferenciales', cat.ID_BAÑO, 1, 'unidad', 'Circuito baño']);
+    if (tableros.length > 1) materiales.push(['Diferenciales', cat.ID_30mA, tableros.length - 1, 'unidad', 'Cabeceras seccionales']);
+
+    let totalCable15 = 0, totalCable25 = 0;
+    Object.values(circuitosPorTablero).forEach(circs => {
+        circs.forEach(c => {
+            if (c.seccion === 1.5) totalCable15 += c.longitud;
+            else if (c.seccion === 2.5) totalCable25 += c.longitud;
+        });
+    });
+    let totalSeccionales = 0;
+    tableros.forEach(t => { if (t.padre) totalSeccionales += t.long; });
+
+    materiales.push(['Cables', 'Cable IRAM NM 247-3 1.5 mm² (IUG)', Math.ceil(totalCable15 * 1.15), 'metros', 'F+N+PE']);
+    materiales.push(['Cables', 'Cable IRAM NM 247-3 2.5 mm² (TUG/TUE)', Math.ceil(totalCable25 * 1.15), 'metros', 'F+N+PE']);
+    materiales.push(['Cables', 'Cable IRAM 2178 4 mm² (Seccionales)', Math.ceil(totalSeccionales * 1.15), 'metros', 'F+N+PE']);
+    materiales.push(['Cables', 'Cable IRAM 2178 4 mm² (PAT)', 10, 'metros', 'Jabalina a tablero']);
+    materiales.push(['Cables', 'Cable IRAM NM 247-3 2.5 mm² (PE)', Math.ceil((totalCable15 + totalCable25) * 1.15), 'metros', 'Verde/amarillo']);
+
+    const totalCanalizacion = totalCable15 + totalCable25;
+    if (tipoInst === 'embutida') {
+        materiales.push(['Canalizaciones', 'Cañería IRAM 62386-21 Rígida 20mm', Math.ceil(totalCanalizacion * 1.15), 'metros', 'Embutida']);
+    } else if (tipoInst === 'vista') {
+        materiales.push(['Canalizaciones', 'Cablecanal IRAM 62084 20x12mm', Math.ceil(totalCanalizacion * 1.15), 'metros', 'A la vista']);
+    } else {
+        materiales.push(['Canalizaciones', 'Cañería IRAM 62386-21 Rígida 20mm', Math.ceil(totalCanalizacion * 0.6), 'metros', 'Embutida']);
+        materiales.push(['Canalizaciones', 'Cablecanal IRAM 62084 20x12mm', Math.ceil(totalCanalizacion * 0.5), 'metros', 'A la vista']);
+    }
+
+    const tIUG = parseInt(document.getElementById('totalIUG').textContent) || 0;
+    const tTUG = parseInt(document.getElementById('totalTUG').textContent) || 0;
+    const tTUE = parseInt(document.getElementById('totalTUE').textContent) || 0;
+    const totalBocas = tIUG + tTUG + tTUE;
+
+    materiales.push(['Cajas', 'Caja rectangular 5x10 (embutir)', totalBocas, 'unidad', 'Bocas']);
+    materiales.push(['Cajas', 'Caja derivación 10x10', Math.ceil(totalBocas / 3), 'unidad', 'Uniones']);
+    materiales.push(['Bocas', 'Tomacorriente 2P+T 10A IRAM 2071', tTUG, 'unidad', 'Bocas TUG']);
+    materiales.push(['Bocas', 'Tomacorriente 2P+T 20A IRAM 2071', tTUE, 'unidad', 'Bocas TUE']);
+    materiales.push(['Bocas', 'Interruptor de efecto', tIUG, 'unidad', 'Comando iluminación']);
+
+    materiales.push(['PAT', 'Jabalina IRAM 2309 5/8" x 1.5m', 1, 'unidad', 'Con tomacable']);
+    materiales.push(['PAT', 'Cámara de inspección', 1, 'unidad', 'A nivel de piso']);
+    materiales.push(['PAT', 'Barra de tierra', tableros.length, 'unidad', 'En cada tablero']);
+
+    materiales.push(['Varios', 'Precintos, grapas, terminales, cintas', 1, 'global', 'Material menor']);
+
+    tbody.innerHTML = materiales.map(m => `
+        <tr>
+            <td><strong>${m[0]}</strong></td>
+            <td style="text-align:left;">${m[1]}</td>
+            <td><strong>${m[2]}</strong></td>
+            <td>${m[3]}</td>
+            <td style="font-size:0.85em;color:var(--text-light);">${m[4]}</td>
+        </tr>`).join('');
+}
+
+// ============================================================
+// VERIFICACIONES
+// ============================================================
+function renderizarVerificaciones() {
+    const verifs = [];
+    const grado = document.getElementById('gradoResult').value;
+    const d = window.__datosExport || {};
+    const dpmsFinal = d.dpmsFinal || 0;
+    const totalIUG = parseInt(document.getElementById('totalIUG').textContent) || 0;
+    const totalTUG = parseInt(document.getElementById('totalTUG').textContent) || 0;
+
+    const limites = { 'MÍNIMO': 3700, 'MEDIO': 7000, 'ELEVADO': 11000, 'SUPERIOR': Infinity };
+    const limiteGrado = limites[grado];
+
+    verifs.push(dpmsFinal <= limiteGrado
+        ? { estado: 'ok', texto: `DPMS (${dpmsFinal.toFixed(0)} VA) dentro del Grado ${grado}.` }
+        : { estado: 'error', texto: `DPMS (${dpmsFinal.toFixed(0)} VA) SUPERA el Grado ${grado}.` });
+
+    verifs.push(totalIUG <= 15
+        ? { estado: 'ok', texto: `Bocas IUG (${totalIUG}) OK.` }
+        : { estado: 'warn', texto: `Bocas IUG (${totalIUG}) divididas en circuitos.` });
+
+    verifs.push(totalTUG <= 15
+        ? { estado: 'ok', texto: `Bocas TUG (${totalTUG}) OK.` }
+        : { estado: 'warn', texto: `Bocas TUG (${totalTUG}) divididas en circuitos.` });
+
+    let caidasMal = 0;
+    Object.values(circuitosPorTablero).forEach(circs => {
+        circs.forEach(c => {
+            const caida = calcularCaidaTension(c.dpms / 220, c.longitud, c.seccion, c.tipo);
+            const limite = c.tipo === 'IUG' ? 3 : 5;
+            if (caida > limite) caidasMal++;
+        });
+    });
+    verifs.push(caidasMal === 0
+        ? { estado: 'ok', texto: `Caída de tensión OK en todos los circuitos.` }
+        : { estado: 'error', texto: `${caidasMal} circuito(s) superan caída admisible.` });
+
+    let motoresMal = 0;
+    Object.values(circuitosPorTablero).forEach(circs => {
+        circs.forEach(c => {
+            if (c.tipo === 'TUE') {
+                const r = calcularArranqueMotor(2800, c.longitud, c.seccion, 'directo');
+                if (r.caidaArranque > 15) motoresMal++;
+            }
+        });
+    });
+    verifs.push(motoresMal > 0
+        ? { estado: 'error', texto: `${motoresMal} motor(es) superan 15% en arranque.` }
+        : { estado: 'ok', texto: `Arranque de motores OK (≤15%).` });
+
+    const iccOrigen = parseFloat(document.getElementById('iccOrigen').value) || 4.5;
+    verifs.push(iccOrigen <= 10
+        ? { estado: 'ok', texto: `Icc origen (${iccOrigen} kA) ≤ 10 kA (AEA 770).` }
+        : { estado: 'error', texto: `Icc origen > 10 kA. Aplicar Sección 771.` });
+
+    document.getElementById('verificaciones').innerHTML = verifs.map(v =>
+        `<div style="margin-bottom:8px;"><span class="badge ${v.estado}">${v.estado === 'ok' ? '✔' : v.estado === 'warn' ? '⚠' : '✖'}</span> ${v.texto}</div>`
+    ).join('');
+}
+
+// ============================================================
+// PLANO
+// ============================================================
+function inicializarPlano() {
+    const ancho = parseFloat(document.getElementById('planoAncho').value) || 15;
+    const alto = parseFloat(document.getElementById('planoAlto').value) || 12;
+    const canvas = document.getElementById('planoCanvas');
+    canvas.width = ancho * ESCALA_PLANO;
+    canvas.height = alto * ESCALA_PLANO;
+
+    canvas.onmousedown = onPlanoMouseDown;
+    canvas.onmousemove = onPlanoMouseMove;
+    canvas.onmouseup = onPlanoMouseUp;
+    canvas.onmouseleave = onPlanoMouseUp;
+
+    dibujarPlano();
+}
+
+function setHerramienta(h) {
+    herramientaActual = h;
+    document.querySelectorAll('.plano-toolbar button').forEach(b => b.classList.remove('active'));
+    const map = { 'select': 'btnSelect', 'boca_iug': 'btnIUG', 'boca_tug': 'btnTUG', 'boca_tue': 'btnTUE', 'tablero': 'btnTablero', 'borrar': 'btnBorrar' };
+    if (map[h]) {
+        const btn = document.getElementById(map[h]);
+        if (btn) btn.classList.add('active');
+    }
+}
+
+function onPlanoMouseDown(e) {
+    const canvas = e.target;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (herramientaActual === 'select') {
+        for (let i = planoElementos.length - 1; i >= 0; i--) {
+            const el = planoElementos[i];
+            if (Math.hypot(x - el.x, y - el.y) < 18) {
+                arrastrando = el;
+                offsetX = x - el.x;
+                offsetY = y - el.y;
+                elementoSeleccionado = el;
+                dibujarPlano();
+                return;
+            }
+        }
+        elementoSeleccionado = null;
+        dibujarPlano();
+    } else if (herramientaActual === 'borrar') {
+        for (let i = planoElementos.length - 1; i >= 0; i--) {
+            const el = planoElementos[i];
+            if (Math.hypot(x - el.x, y - el.y) < 18) {
+                planoElementos.splice(i, 1);
+                dibujarPlano();
+                actualizarContadoresPlano();
+                return;
+            }
+        }
+    } else {
+        const nuevo = {
+            id: 'el_' + Date.now(),
+            tipo: herramientaActual,
+            x, y,
+            nombre: herramientaActual === 'boca_iug' ? 'IUG' : herramientaActual === 'boca_tug' ? 'TUG' : herramientaActual === 'boca_tue' ? 'TUE' : 'Tablero',
+            ambiente: ''
+        };
+        planoElementos.push(nuevo);
+        elementoSeleccionado = nuevo;
+        dibujarPlano();
+        actualizarContadoresPlano();
+    }
+}
+
+function onPlanoMouseMove(e) {
+    if (!arrastrando) return;
+    const canvas = e.target;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    arrastrando.x = Math.max(15, Math.min(canvas.width - 15, x - offsetX));
+    arrastrando.y = Math.max(15, Math.min(canvas.height - 15, y - offsetY));
+    dibujarPlano();
+}
+
+function onPlanoMouseUp() {
+    if (arrastrando) {
+        arrastrando = null;
+        actualizarContadoresPlano();
+    }
+}
+
+function dibujarPlano() {
+    const canvas = document.getElementById('planoCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const bgColor = modoOscuro ? '#2a2a3e' : '#fafafa';
+    const gridColor = modoOscuro ? '#3a3a4e' : '#e0e0e0';
+    const textColor = modoOscuro ? '#e0e0e0' : '#333';
+
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += ESCALA_PLANO) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 0; y < H; y += ESCALA_PLANO) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    ctx.fillStyle = textColor;
+    ctx.font = '10px sans-serif';
+    for (let x = 0; x < W; x += ESCALA_PLANO * 5) ctx.fillText((x / ESCALA_PLANO) + 'm', x + 3, 12);
+    for (let y = 0; y < H; y += ESCALA_PLANO * 5) ctx.fillText((y / ESCALA_PLANO) + 'm', 3, y + 12);
+
+    planoElementos.forEach(el => {
+        const color = el.tipo === 'boca_iug' ? '#f39c12' :
+                      el.tipo === 'boca_tug' ? '#3498db' :
+                      el.tipo === 'boca_tue' ? '#e74c3c' :
+                      el.tipo === 'tablero' ? '#9b59b6' : '#95a5a6';
+
+        if (el === elementoSeleccionado) {
+            ctx.fillStyle = 'rgba(102,126,234,0.3)';
+            ctx.beginPath();
+            ctx.arc(el.x, el.y, 22, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(el.x, el.y, el.tipo === 'tablero' ? 18 : 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 9px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(el.tipo === 'tablero' ? 'TB' : el.tipo === 'boca_iug' ? 'IUG' : el.tipo === 'boca_tug' ? 'TUG' : 'TUE', el.x, el.y);
+
+        if (el.ambiente) {
+            ctx.fillStyle = textColor;
+            ctx.font = '9px sans-serif';
+            ctx.fillText(el.ambiente, el.x, el.y + 22);
+        }
+    });
+
+    mostrarPanelElemento();
+}
+
+function mostrarPanelElemento() {
+    const panel = document.getElementById('panelElemento');
+    if (!elementoSeleccionado) { panel.style.display = 'none'; return; }
+    panel.style.display = 'block';
+    const el = elementoSeleccionado;
+    panel.innerHTML = `
+        <h4>🔧 ${el.nombre}</h4>
+        <label>Ambiente</label>
+        <input type="text" value="${el.ambiente}" onchange="actualizarElemento('ambiente', this.value)">
+        <label>Tipo</label>
+        <select onchange="actualizarElemento('tipo', this.value)">
+            <option value="boca_iug" ${el.tipo === 'boca_iug' ? 'selected' : ''}>Boca IUG</option>
+            <option value="boca_tug" ${el.tipo === 'boca_tug' ? 'selected' : ''}>Boca TUG</option>
+            <option value="boca_tue" ${el.tipo === 'boca_tue' ? 'selected' : ''}>Boca TUE</option>
+            <option value="tablero" ${el.tipo === 'tablero' ? 'selected' : ''}>Tablero</option>
+        </select>
+        <div style="margin-top:8px;">
+            <button class="danger small" onclick="eliminarElementoSeleccionado()">🗑️ Eliminar</button>
+        </div>`;
+}
+
+function actualizarElemento(campo, valor) {
+    if (!elementoSeleccionado) return;
+    elementoSeleccionado[campo] = valor;
+    if (campo === 'tipo') {
+        elementoSeleccionado.nombre = valor === 'boca_iug' ? 'IUG' : valor === 'boca_tug' ? 'TUG' : valor === 'boca_tue' ? 'TUE' : 'Tablero';
+    }
+    dibujarPlano();
+    actualizarContadoresPlano();
+}
+
+function eliminarElementoSeleccionado() {
+    if (!elementoSeleccionado) return;
+    const idx = planoElementos.indexOf(elementoSeleccionado);
+    if (idx >= 0) planoElementos.splice(idx, 1);
+    elementoSeleccionado = null;
+    dibujarPlano();
+    actualizarContadoresPlano();
+}
+
+function limpiarPlano() {
+    if (planoElementos.length === 0) return;
+    if (!confirm('¿Borrar todos los elementos del plano?')) return;
+    planoElementos = [];
+    elementoSeleccionado = null;
+    dibujarPlano();
+    actualizarContadoresPlano();
+}
+
+function actualizarContadoresPlano() {
+    const iug = planoElementos.filter(e => e.tipo === 'boca_iug').length;
+    const tug = planoElementos.filter(e => e.tipo === 'boca_tug').length;
+    const tue = planoElementos.filter(e => e.tipo === 'boca_tue').length;
+    const elIUG = document.getElementById('planoIUG');
+    const elTUG = document.getElementById('planoTUG');
+    const elTUE = document.getElementById('planoTUE');
+    const elTotal = document.getElementById('planoTotal');
+    if (elIUG) elIUG.textContent = iug;
+    if (elTUG) elTUG.textContent = tug;
+    if (elTUE) elTUE.textContent = tue;
+    if (elTotal) elTotal.textContent = planoElementos.length;
+}
+
+function autoUbicarBocas() {
+    if (planoElementos.length > 0 && !confirm('¿Borrar el plano actual y auto-ubicar bocas?')) return;
+    planoElementos = [];
+    const canvas = document.getElementById('planoCanvas');
+    const W = canvas.width, H = canvas.height;
+    if (ambientes.length === 0) { mostrarToast('⚠️ No hay ambientes cargados'); return; }
+
+    const cols = Math.ceil(Math.sqrt(ambientes.length));
+    const anchoCelda = W / cols;
+    const altoCelda = H / Math.ceil(ambientes.length / cols);
+    let counter = 0;
+
+    ambientes.forEach((amb, i) => {
+        const col = i % cols;
+        const fila = Math.floor(i / cols);
+        const centroX = col * anchoCelda + anchoCelda / 2;
+        const centroY = fila * altoCelda + altoCelda / 2;
+        const b = calcularBocas(amb);
+        const totalBocasAmb = b.iug + b.tug + b.tue;
+        if (totalBocasAmb === 0) return;
+        let idx = 0;
+        const agregar = (tipo) => {
+            const angulo = (idx / totalBocasAmb) * Math.PI * 2;
+            const radio = Math.min(anchoCelda, altoCelda) / 3;
+            planoElementos.push({
+                id: 'el_' + Date.now() + '_' + (counter++),
+                tipo,
+                nombre: tipo === 'boca_iug' ? 'IUG' : tipo === 'boca_tug' ? 'TUG' : 'TUE',
+                ambiente: amb.nombre,
+                x: centroX + Math.cos(angulo) * radio,
+                y: centroY + Math.sin(angulo) * radio
+            });
+            idx++;
+        };
+        for (let j = 0; j < b.iug; j++) agregar('boca_iug');
+        for (let j = 0; j < b.tug; j++) agregar('boca_tug');
+        for (let j = 0; j < b.tue; j++) agregar('boca_tue');
+    });
+
+    dibujarPlano();
+    actualizarContadoresPlano();
+    mostrarToast('✅ Bocas auto-ubicadas: ' + planoElementos.length);
+}
+
+function exportarPlanoPNG() {
+    const canvas = document.getElementById('planoCanvas');
+    const link = document.createElement('a');
+    link.download = 'plano_electrico.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+// ============================================================
+// ESQUEMA SVG
+// ============================================================
+function dibujarEsquemaSVG() {
+    const container = document.getElementById('svgContainer');
+    if (!container) return;
+    const tieneCircuitos = Object.values(circuitosPorTablero).some(c => c.length > 0);
+    if (!tieneCircuitos) { container.innerHTML = '<div class="empty-msg">Sin circuitos</div>'; return; }
+
+    const ancho = 1100;
+    const altoNodo = 55;
+    const separacion = 12;
+    const padding = 25;
+    let altoTotal = padding * 2 + altoNodo * (tableros.length + 3) + separacion * (tableros.length + 3) + 60;
+    Object.values(circuitosPorTablero).forEach(circs => {
+        if (circs.length > 0) altoTotal += Math.ceil(circs.length / 6) * 55 + separacion + 15;
+    });
+
+    const colorTexto = modoOscuro ? '#e0e0e0' : '#333';
+    const colorLinea = modoOscuro ? '#7b8ff0' : '#667eea';
+    const colorNodo = modoOscuro ? '#2a2a3e' : '#f8f9fa';
+    const colorBorde = modoOscuro ? '#444' : '#ddd';
+    const nodoSVG = (x, yy, w, h, fill, stroke) => `<rect x="${x}" y="${yy}" width="${w}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="2" rx="6"/>`;
+
+    let svg = `<svg viewBox="0 0 ${ancho} ${altoTotal}" xmlns="http://www.w3.org/2000/svg" style="font-family: sans-serif;">`;
+    let y = padding;
+    const centroX = ancho / 2;
+
+    svg += `<line x1="${centroX}" y1="0" x2="${centroX}" y2="${y}" stroke="${colorLinea}" stroke-width="3"/>`;
+    svg += `<text x="${centroX + 10}" y="${y - 5}" fill="${colorTexto}" font-size="10">Acometida 220/380V</text>`;
+    svg += nodoSVG(centroX - 70, y, 140, altoNodo, colorNodo, colorBorde);
+    svg += `<text x="${centroX}" y="${y + 22}" fill="${colorTexto}" font-size="11" font-weight="bold" text-anchor="middle">MEDIDOR</text>`;
+    svg += `<text x="${centroX}" y="${y + 38}" fill="${colorTexto}" font-size="9" text-anchor="middle">Icc: ${tableros[0].iccArriba.toFixed(1)} kA</text>`;
+    y += altoNodo + separacion;
+
+    tableros.forEach(t => {
+        const circs = circuitosPorTablero[t.id] || [];
+        if (t.padre && circs.length === 0) return;
+
+        svg += `<line x1="${centroX}" y1="${y - separacion}" x2="${centroX}" y2="${y}" stroke="${colorLinea}" stroke-width="3"/>`;
+        if (t.padre) svg += `<text x="${centroX + 15}" y="${y - 5}" fill="${colorTexto}" font-size="9">${t.long}m · ${t.seccion}mm²</text>`;
+
+        const wTab = 240;
+        svg += nodoSVG(centroX - wTab / 2, y, wTab, altoNodo, colorNodo, colorBorde);
+        svg += `<text x="${centroX}" y="${y + 22}" fill="${colorTexto}" font-size="11" font-weight="bold" text-anchor="middle">${t.nombre.toUpperCase()}</text>`;
+        svg += `<text x="${centroX}" y="${y + 38}" fill="${colorTexto}" font-size="9" text-anchor="middle">Icc: ${t.iccArriba.toFixed(2)} kA · PdC ≥ ${pdcComercial(t.iccArriba)} kA</text>`;
+        y += altoNodo + separacion;
+
+        if (circs.length > 0) {
+            const cols = Math.min(circs.length, 6);
+            const filas = Math.ceil(circs.length / cols);
+            const anchoCirc = (ancho - padding * 4) / cols;
+
+            svg += `<line x1="${padding + anchoCirc / 2}" y1="${y + 12}" x2="${padding + anchoCirc * (cols - 0.5)}" y2="${y + 12}" stroke="${colorLinea}" stroke-width="2"/>`;
+            svg += `<line x1="${centroX}" y1="${y}" x2="${centroX}" y2="${y + 12}" stroke="${colorLinea}" stroke-width="2"/>`;
+            y += 12;
+
+            circs.forEach((c, ci) => {
+                const col = ci % cols;
+                const fila = Math.floor(ci / cols);
+                const x = padding + anchoCirc * col + anchoCirc / 2;
+                const yCaja = y + fila * 55;
+                const color = c.tipo === 'IUG' ? '#f39c12' : c.tipo === 'TUG' ? '#3498db' : '#e74c3c';
+
+                svg += `<line x1="${x}" y1="${yCaja}" x2="${x}" y2="${yCaja + 15}" stroke="${color}" stroke-width="2"/>`;
+                svg += nodoSVG(x - 55, yCaja + 15, 110, 40, colorNodo, color);
+                svg += `<text x="${x}" y="${yCaja + 30}" fill="${colorTexto}" font-size="10" font-weight="bold" text-anchor="middle">${c.nombre} · ${c.tipo}</text>`;
+                svg += `<text x="${x}" y="${yCaja + 44}" fill="${colorTexto}" font-size="9" text-anchor="middle">${c.bocas}b · ${c.proteccion}A · ${c.seccion}mm²</text>`;
+            });
+
+            y += filas * 55 + separacion;
+        }
+    });
+
+    svg += `<line x1="${padding}" y1="${y}" x2="${ancho - padding}" y2="${y}" stroke="${colorLinea}" stroke-width="2" stroke-dasharray="5,5"/>`;
+    svg += `<text x="${centroX}" y="${y + 18}" fill="${colorTexto}" font-size="10" font-weight="bold" text-anchor="middle">⏚ PUESTA A TIERRA (R ≤ 40 Ω)</text>`;
+    svg += `</svg>`;
+    container.innerHTML = svg;
+}
+
+// ============================================================
+// GUARDAR / CARGAR PROYECTO
+// ============================================================
+function obtenerProyectos() {
+    try {
+        const data = localStorage.getItem('aea770_proyectos_v8_local');
+        return data ? JSON.parse(data) : {};
+    } catch(e) { return {}; }
+}
+
+function guardarProyectos(proyectos) {
+    try {
+        localStorage.setItem('aea770_proyectos_v8_local', JSON.stringify(proyectos));
+        actualizarSelectorProyectos();
+    } catch(e) {
+        alert('No se pudo guardar: ' + e.message);
+    }
+}
+
+function actualizarSelectorProyectos() {
+    const proyectos = obtenerProyectos();
+    const selector = document.getElementById('selectorProyecto');
+    if (!selector) return;
+    const actual = selector.value;
+    selector.innerHTML = '<option value="">-- Proyectos --</option>';
+    Object.keys(proyectos).forEach(id => {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = proyectos[id].nombre || id;
+        selector.appendChild(opt);
+    });
+    if (actual && proyectos[actual]) selector.value = actual;
+}
+
+function capturarProyecto() {
+    return {
+        version: '8.0-local',
+        fecha: new Date().toISOString(),
+        nombre: document.getElementById('nombreProyecto').value || 'Sin nombre',
+        supCubierta: document.getElementById('supCubierta').value,
+        supSemicubierta: document.getElementById('supSemicubierta').value,
+        iccOrigen: document.getElementById('iccOrigen').value,
+        marca: document.getElementById('marcaInterruptores').value,
+        tipoInstalacion: document.getElementById('tipoInstalacion').value,
+        ambientes, circuitosPorTablero, tableros, planoElementos, modoOscuro,
+        contadorTableros
+    };
+}
+
+function aplicarProyecto(p) {
+    document.getElementById('nombreProyecto').value = p.nombre || 'Mi Vivienda';
+    document.getElementById('supCubierta').value = p.supCubierta || 94;
+    document.getElementById('supSemicubierta').value = p.supSemicubierta || 4;
+    document.getElementById('iccOrigen').value = p.iccOrigen || 4.5;
+    document.getElementById('marcaInterruptores').value = p.marca || 'Schneider';
+    document.getElementById('tipoInstalacion').value = p.tipoInstalacion || 'embutida';
+
+    let tablerosMigrados = Array.isArray(p.tableros) ? p.tableros.slice() : [];
+    if (tablerosMigrados.length === 0) {
+        tablerosMigrados = [{
+            id: 'Principal', nombre: 'Tablero Principal', planta: 'PB',
+            long: 0, seccion: 4, iccArriba: 4.5, padre: null
+        }];
+    }
+    const tieneFormatoNuevo = tablerosMigrados.every(t => t.padre !== undefined);
+    if (!tieneFormatoNuevo) {
+        const principal = tablerosMigrados.find(t => t.id === 'Principal') || tablerosMigrados[0];
+        principal.padre = null;
+        principal.planta = principal.planta || 'PB';
+        tablerosMigrados.forEach(t => {
+            if (t.id !== principal.id) {
+                t.padre = principal.id;
+                t.planta = t.planta || 'PB';
+            }
+        });
+    }
+    tablerosMigrados = tablerosMigrados.filter(t => t.id && t.nombre);
+    const idsVistos = new Set();
+    tablerosMigrados = tablerosMigrados.filter(t => {
+        if (idsVistos.has(t.id)) return false;
+        idsVistos.add(t.id);
+        return true;
+    });
+    tablerosMigrados.forEach(t => {
+        if (t.planta === undefined) t.planta = 'PB';
+        if (t.long === undefined) t.long = 0;
+        if (t.seccion === undefined) t.seccion = 4;
+        if (t.iccArriba === undefined) t.iccArriba = null;
+        if (t.padre === undefined) t.padre = null;
+    });
+    const tienePrincipal = tablerosMigrados.some(t => !t.padre);
+    if (!tienePrincipal) {
+        tablerosMigrados.unshift({
+            id: 'Principal', nombre: 'Tablero Principal', planta: 'PB',
+            long: 0, seccion: 4, iccArriba: 4.5, padre: null
+        });
+    }
+    const idsValidos = new Set(tablerosMigrados.map(t => t.id));
+    tablerosMigrados.forEach(t => {
+        if (t.padre && !idsValidos.has(t.padre)) {
+            const principal = tablerosMigrados.find(x => !x.padre);
+            t.padre = principal ? principal.id : null;
+        }
+    });
+    tableros = tablerosMigrados;
+
+    ambientes = Array.isArray(p.ambientes) ? p.ambientes.slice() : [];
+    const principalId = tableros.find(t => !t.padre).id;
+    ambientes.forEach(a => {
+        if (!a.tablero || !tableros.find(t => t.id === a.tablero)) {
+            a.tablero = principalId;
+        }
+        ['iugReal', 'tugReal', 'tueReal'].forEach(k => {
+            if (a[k] !== undefined && (typeof a[k] !== 'number' || isNaN(a[k]))) delete a[k];
+        });
+    });
+
+    circuitosPorTablero = {};
+    const cpt = p.circuitosPorTablero || {};
+    tableros.forEach(t => {
+        circuitosPorTablero[t.id] = Array.isArray(cpt[t.id]) ? cpt[t.id] : [];
+    });
+
+    planoElementos = Array.isArray(p.planoElementos) ? p.planoElementos.slice() : [];
+    planoElementos = planoElementos.filter(el =>
+        el && typeof el.x === 'number' && typeof el.y === 'number' && el.tipo
+    );
+
+    contadorTableros = p.contadorTableros || 1;
+    tableros.forEach(t => {
+        const num = parseInt(String(t.id).replace('T', ''));
+        if (!isNaN(num) && num > contadorTableros) contadorTableros = num;
+    });
+
+    if (p.modoOscuro !== undefined && p.modoOscuro !== modoOscuro) toggleTema();
+
+    try {
+        renderizarTodo();
+    } catch(e) {
+        console.error('❌ Error al renderizar:', e);
+        alert('Error al renderizar el proyecto: ' + e.message);
+    }
+
+    setTimeout(() => {
+        const tablerosVacios = tableros.filter(t =>
+            t.padre &&
+            (circuitosPorTablero[t.id] || []).length === 0 &&
+            !ambientes.some(a => a.tablero === t.id)
+        );
+        if (tablerosVacios.length > 0) {
+            tablerosVacios.forEach(t => {
+                const idx = tableros.indexOf(t);
+                if (idx >= 0) tableros.splice(idx, 1);
+            });
+            renderizarTodo();
+        }
+        try {
+            inicializarPlano();
+            dibujarPlano();
+            actualizarContadoresPlano();
+        } catch(e) {
+            console.error('Error al inicializar plano:', e);
+        }
+    }, 300);
+}
+
+// ============================================================
+// IMPORTAR ARCHIVO JSON
+// ============================================================
+function importarArchivoJSON(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const texto = e.target.result;
+            const p = JSON.parse(texto);
+            if (!p.ambientes && !p.tableros) {
+                throw new Error('El archivo no parece ser un proyecto válido (falta "ambientes" o "tableros")');
+            }
+            if (confirm('¿Cargar el proyecto "' + (p.nombre || 'sin nombre') + '"?\nSe reemplazará el proyecto actual.')) {
+                aplicarProyecto(p);
+                proyectoActualId = null;
+                document.getElementById('selectorProyecto').value = '';
+                mostrarToast('✅ Proyecto importado: ' + (p.nombre || 'sin nombre'));
+            }
+        } catch(err) {
+            console.error(err);
+            alert('❌ Error al importar archivo:\n' + err.message);
+        }
+    };
+    reader.readAsText(file);
+    input.value = '';
+}
+
+// ============================================================
+// GUARDAR / NUEVO / CAMBIAR PROYECTO
+// ============================================================
+function guardarProyecto() {
+    const id = proyectoActualId || 'proy_' + Date.now();
+    const proyectos = obtenerProyectos();
+    proyectos[id] = capturarProyecto();
+    guardarProyectos(proyectos);
+    proyectoActualId = id;
+    document.getElementById('selectorProyecto').value = id;
+    mostrarToast('✅ Guardado: ' + proyectos[id].nombre);
+}
+
+function nuevoProyecto() {
+    if (!confirm('¿Crear un nuevo proyecto? Se perderán los cambios no guardados.')) return;
+    proyectoActualId = null;
+    document.getElementById('nombreProyecto').value = 'Nuevo Proyecto';
+    document.getElementById('supCubierta').value = 94;
+    document.getElementById('supSemicubierta').value = 4;
+    document.getElementById('iccOrigen').value = 4.5;
+    document.getElementById('marcaInterruptores').value = 'Schneider';
+    document.getElementById('tipoInstalacion').value = 'embutida';
+    document.getElementById('selectorProyecto').value = '';
+    ambientes = [
+        { nombre: 'Estar-Comedor', tipo: 'Habitación', area: 24, tablero: 'Principal' },
+        { nombre: 'Cocina', tipo: 'Cocina', area: 10, tablero: 'Principal' },
+        { nombre: 'Baño 1', tipo: 'Baño', area: 4, tablero: 'Principal' },
+        { nombre: 'Dormitorio 1', tipo: 'Dormitorio', area: 15, tablero: 'T1' }
+    ];
+    circuitosPorTablero = {};
+    tableros = [
+        { id: 'Principal', nombre: 'Tablero Principal', planta: 'PB', long: 0, seccion: 4, iccArriba: 4.5, padre: null },
+        { id: 'T1', nombre: 'Tablero Planta Alta', planta: 'PA', long: 15, seccion: 4, iccArriba: null, padre: 'Principal' }
+    ];
+    contadorTableros = 1;
+    planoElementos = [];
+    renderizarTodo();
+    setTimeout(() => { inicializarPlano(); limpiarPlano(); }, 200);
+}
+
+function cambiarProyecto(id) {
+    if (!id) return;
+    const proyectos = obtenerProyectos();
+    if (!proyectos[id]) return;
+    if (!confirm('¿Cargar el proyecto "' + proyectos[id].nombre + '"?')) {
+        document.getElementById('selectorProyecto').value = proyectoActualId || '';
+        return;
+    }
+    proyectoActualId = id;
+    aplicarProyecto(proyectos[id]);
+    mostrarToast('📂 Cargado: ' + proyectos[id].nombre);
+}
+
+function resetear() {
+    if (confirm('¿Reiniciar TODO el diseño?')) nuevoProyecto();
+}
+
+// ============================================================
+// MODAL JSON
+// ============================================================
+let accionJSONActual = null;
+
+function abrirModalJSON(accion) {
+    accionJSONActual = accion;
+    const modal = document.getElementById('modalJSON');
+    const titulo = document.getElementById('modalJSONTitulo');
+    const texto = document.getElementById('modalJSONTexto');
+    const boton = document.getElementById('modalJSONAccion');
+
+    if (accion === 'exportar') {
+        titulo.textContent = '📤 Exportar JSON del Proyecto';
+        texto.value = JSON.stringify(capturarProyecto(), null, 2);
+        texto.readOnly = true;
+        boton.textContent = 'Copiar';
+        boton.className = 'info';
+    } else {
+        titulo.textContent = '📥 Importar JSON del Proyecto';
+        texto.value = '';
+        texto.readOnly = false;
+        texto.placeholder = 'Pegá aquí el JSON...';
+        boton.textContent = 'Importar';
+        boton.className = 'success';
+    }
+    modal.classList.add('active');
+}
+
+function cerrarModalJSON() { document.getElementById('modalJSON').classList.remove('active'); }
+
+function ejecutarAccionJSON() {
+    const texto = document.getElementById('modalJSONTexto').value.trim();
+    if (accionJSONActual === 'exportar') {
+        navigator.clipboard.writeText(texto).then(() => mostrarToast('📋 Copiado')).catch(() => {
+            document.getElementById('modalJSONTexto').select();
+            document.execCommand('copy');
+            mostrarToast('📋 Copiado');
+        });
+        cerrarModalJSON();
+    } else {
+        try {
+            const p = JSON.parse(texto);
+            if (!p.ambientes && !p.tableros) throw new Error('JSON inválido');
+            aplicarProyecto(p);
+            proyectoActualId = null;
+            cerrarModalJSON();
+            mostrarToast('✅ Importado');
+        } catch(e) {
+            alert('❌ Error: ' + e.message);
+        }
+    }
+}
+
+function exportarJSON() { abrirModalJSON('exportar'); }
+
+// ============================================================
+// ABRIR REPARTO DE TABLEROS (reparto_tableros.html)
+// ============================================================
+function abrirRepartoTableros() {
+    try {
+        const id = proyectoActualId || 'proy_temp_reparto';
+        const proyectos = obtenerProyectos();
+        proyectos[id] = capturarProyecto();
+        guardarProyectos(proyectos);
+        proyectoActualId = id;
+        document.getElementById('selectorProyecto').value = id;
+        mostrarToast('💾 Proyecto guardado antes de abrir Reparto');
+    } catch(e) {
+        console.warn('No se pudo autoguardar antes de abrir Reparto:', e);
+    }
+    window.open('reparto_tableros.html', '_blank');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function mostrarToast(mensaje) {
+    const toast = document.createElement('div');
+    toast.textContent = mensaje;
+    toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#2c3e50;color:white;padding:12px 20px;border-radius:8px;font-size:0.9em;z-index:2000;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// ============================================================
+// ASEGURAR DATOS DE EXPORTACIÓN
+// ============================================================
+function asegurarDatosExport() {
+    if (ambientes.length === 0) {
+        alert('⚠️ No hay ambientes cargados. Agregá ambientes antes de exportar.');
+        return false;
+    }
+    // Si __datosExport no está completo, forzar el recálculo
+    if (!window.__datosExport || window.__datosExport.dpmsFinal === undefined) {
+        renderizarDPMS();
+    }
+    return true;
+}
+
+function verificarLibrerias(tipo) {
+    if (tipo === 'excel' && typeof XLSX === 'undefined') {
+        alert('❌ La librería XLSX no está cargada.\n\nVerificá que exista el archivo:\nlibs/xlsx.full.min.js');
+        return false;
+    }
+    if (tipo === 'pdf') {
+        if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+            alert('❌ La librería jsPDF no está cargada.\n\nVerificá que exista el archivo:\nlibs/jspdf.umd.min.js');
+            return false;
+        }
+    }
+    return true;
+}
+
+// ============================================================
+// EXPORTAR EXCEL (CORREGIDO)
+// ============================================================
+function exportarExcel() {
+    if (!verificarLibrerias('excel')) return;
+    if (!asegurarDatosExport()) return;
+
+    try {
+        const wb = XLSX.utils.book_new();
+        const d = window.__datosExport || {};
+        const iccOrigen = parseFloat(document.getElementById('iccOrigen').value) || 4.5;
+
+        const hoja1 = [
+            ['DISEÑO ELÉCTRICO AEA 770 - v8 Local'],
+            ['Proyecto:', document.getElementById('nombreProyecto').value],
+            ['Fecha:', new Date().toLocaleDateString('es-AR')],
+            [],
+            ['DATOS GENERALES'],
+            ['Superficie Cubierta (m²)', parseFloat(document.getElementById('supCubierta').value)],
+            ['Superficie Semicubierta (m²)', parseFloat(document.getElementById('supSemicubierta').value)],
+            ['Sla (m²)', calcularSla().toFixed(2)],
+            ['Grado', document.getElementById('gradoResult').value],
+            ['Marca', document.getElementById('marcaInterruptores').value],
+            ['Icc Origen (kA)', iccOrigen],
+            [],
+            ['TOTALES'],
+            ['Bocas IUG', d.totalIUG || 0],
+            ['Bocas TUG', d.totalTUG || 0],
+            ['Bocas TUE', d.totalTUE || 0],
+            ['Circuitos IUG', d.totalCircIUG || 0],
+            ['Circuitos TUG', d.totalCircTUG || 0],
+            ['Circuitos TUE', d.totalCircTUE || 0],
+            ['DPMS Total (VA)', (d.dpmsTotal || 0).toFixed(0)],
+            ['DPMS Final (VA)', (d.dpmsFinal || 0).toFixed(0)]
+        ];
+        const ws1 = XLSX.utils.aoa_to_sheet(hoja1);
+        ws1['!cols'] = [{wch:30},{wch:20}];
+        XLSX.utils.book_append_sheet(wb, ws1, 'Datos Generales');
+
+        const hoja2 = [['Ambiente', 'Tipo', 'Superficie (m²)', 'Tablero', 'IUG mín', 'IUG real', 'TUG mín', 'TUG real', 'TUE mín', 'TUE real']];
+        ambientes.forEach(amb => {
+            const b = calcularBocas(amb);
+            const tabNombre = (tableros.find(t => t.id === amb.tablero) || {nombre: amb.tablero}).nombre;
+            hoja2.push([amb.nombre, amb.tipo, amb.area, tabNombre, b.minIUG, b.iug, b.minTUG, b.tug, b.minTUE, b.tue]);
+        });
+        const ws2 = XLSX.utils.aoa_to_sheet(hoja2);
+        ws2['!cols'] = [{wch:22},{wch:16},{wch:14},{wch:20},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8}];
+        XLSX.utils.book_append_sheet(wb, ws2, 'Ambientes');
+
+        const hoja3 = [['Circuito', 'Tablero', 'Tipo', 'Bocas', 'DPMS', 'Secc.', 'Prot.', 'Long.', 'ΔU (%)', 'Icc Abajo', 'PdC']];
+        Object.keys(circuitosPorTablero).forEach(tid => {
+            circuitosPorTablero[tid].forEach(c => {
+                const caida = calcularCaidaTension(c.dpms / 220, c.longitud, c.seccion, c.tipo);
+                const iccAbajo = calcularIccAguasAbajo(c.iccArriba, c.longitud, c.seccion);
+                const tabNombre = (tableros.find(t => t.id === c.tablero) || {nombre: c.tablero}).nombre;
+                hoja3.push([c.nombre, tabNombre, c.tipo, c.bocas, c.dpms, c.seccion, c.proteccion, c.longitud, caida.toFixed(2), iccAbajo.toFixed(2), pdcComercial(iccAbajo)]);
+            });
+        });
+        const ws3 = XLSX.utils.aoa_to_sheet(hoja3);
+        ws3['!cols'] = [{wch:8},{wch:20},{wch:8},{wch:8},{wch:10},{wch:8},{wch:8},{wch:8},{wch:10},{wch:12},{wch:8}];
+        XLSX.utils.book_append_sheet(wb, ws3, 'Circuitos');
+
+        const hoja4 = [['Circuito TUE', 'Tablero', 'Potencia (W)', 'Corriente Nominal (A)', 'Corriente Arranque (A)', 'Longitud (m)', 'Sección', 'ΔU Régimen (%)', 'ΔU Arranque (%)']];
+        Object.keys(circuitosPorTablero).forEach(tid => {
+            circuitosPorTablero[tid].forEach(c => {
+                if (c.tipo === 'TUE') {
+                    const r = calcularArranqueMotor(2800, c.longitud, c.seccion, 'directo');
+                    const tabNombre = (tableros.find(t => t.id === c.tablero) || {nombre: c.tablero}).nombre;
+                    hoja4.push([c.nombre, tabNombre, 2800, r.corrienteNominal.toFixed(2), r.corrienteArranque.toFixed(2), c.longitud, c.seccion, r.caidaNominal.toFixed(2), r.caidaArranque.toFixed(2)]);
+                }
+            });
+        });
+        const ws4 = XLSX.utils.aoa_to_sheet(hoja4);
+        ws4['!cols'] = [{wch:12},{wch:20},{wch:12},{wch:18},{wch:20},{wch:10},{wch:10},{wch:14},{wch:15}];
+        XLSX.utils.book_append_sheet(wb, ws4, 'Motores');
+
+        const hoja5 = [['Tablero', 'Planta', 'Padre', 'Longitud (m)', 'Sección', 'Icc Arriba (kA)', 'PdC (kA)']];
+        tableros.forEach(t => {
+            const padre = t.padre ? (tableros.find(x => x.id === t.padre) || {nombre: t.padre}).nombre : '(Acometida)';
+            hoja5.push([t.nombre, t.planta, padre, t.long, t.seccion, (t.iccArriba || 0).toFixed(2), pdcComercial(t.iccArriba || 4.5)]);
+        });
+        const ws5 = XLSX.utils.aoa_to_sheet(hoja5);
+        ws5['!cols'] = [{wch:30},{wch:10},{wch:25},{wch:15},{wch:10},{wch:15},{wch:10}];
+        XLSX.utils.book_append_sheet(wb, ws5, 'Tableros');
+
+        const hoja6 = [['Categoría', 'Descripción', 'Cantidad', 'Unidad', 'Notas']];
+        document.querySelectorAll('#tbodyMateriales tr').forEach(tr => {
+            const celdas = tr.querySelectorAll('td');
+            if (celdas.length >= 5) hoja6.push([...celdas].map(td => td.textContent.trim()));
+        });
+        const ws6 = XLSX.utils.aoa_to_sheet(hoja6);
+        ws6['!cols'] = [{wch:15},{wch:55},{wch:10},{wch:10},{wch:35}];
+        XLSX.utils.book_append_sheet(wb, ws6, 'Materiales');
+
+        const hoja7 = [['Tipo', 'Ambiente', 'X (m)', 'Y (m)']];
+        planoElementos.forEach(el => {
+            hoja7.push([el.tipo, el.ambiente || '-', (el.x / ESCALA_PLANO).toFixed(2), (el.y / ESCALA_PLANO).toFixed(2)]);
+        });
+        const ws7 = XLSX.utils.aoa_to_sheet(hoja7);
+        ws7['!cols'] = [{wch:15},{wch:20},{wch:12},{wch:12}];
+        XLSX.utils.book_append_sheet(wb, ws7, 'Plano');
+
+        const hoja8 = [['Estado', 'Detalle']];
+        document.querySelectorAll('#verificaciones > div').forEach(div => {
+            const badge = div.querySelector('.badge');
+            if (!badge) return;
+            const texto = div.textContent.replace(badge.textContent, '').trim();
+            hoja8.push([badge.classList.contains('ok') ? 'OK' : badge.classList.contains('warn') ? 'ADVERTENCIA' : 'ERROR', texto]);
+        });
+        const ws8 = XLSX.utils.aoa_to_sheet(hoja8);
+        ws8['!cols'] = [{wch:15},{wch:90}];
+        XLSX.utils.book_append_sheet(wb, ws8, 'Verificaciones');
+
+        XLSX.writeFile(wb, 'Diseño_Electrico_AEA770_v8_local.xlsx');
+        mostrarToast('✅ Excel exportado correctamente');
+    } catch(e) {
+        console.error('Error al exportar Excel:', e);
+        alert('❌ Error al exportar Excel:\n' + e.message);
+    }
+}
+
+// ============================================================
+// EXPORTAR PDF (CORREGIDO)
+// ============================================================
+function exportarPDF() {
+    if (!verificarLibrerias('pdf')) return;
+    if (!asegurarDatosExport()) return;
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const fecha = new Date().toLocaleDateString('es-AR');
+        const d = window.__datosExport || {};
+        const iccOrigen = parseFloat(document.getElementById('iccOrigen').value) || 4.5;
+
+        doc.setFillColor(44, 62, 80);
+        doc.rect(0, 0, 210, 28, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(15);
+        doc.setFont('helvetica', 'bold');
+        doc.text('DISEÑO ELÉCTRICO AEA 770', 105, 12, { align: 'center' });
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(document.getElementById('nombreProyecto').value, 105, 19, { align: 'center' });
+        doc.text('Fecha: ' + fecha + ' | Marca: ' + document.getElementById('marcaInterruptores').value, 105, 25, { align: 'center' });
+
+        doc.setTextColor(0, 0, 0);
+        let y = 38;
+
+        doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+        doc.text('1. DATOS GENERALES', 15, y); y += 6;
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+        doc.text('Sla: ' + calcularSla().toFixed(2) + ' m² | Grado: ' + document.getElementById('gradoResult').value + ' | Icc Origen: ' + iccOrigen + ' kA', 15, y); y += 8;
+
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+        doc.text('2. AMBIENTES', 15, y); y += 4;
+        const ambData = ambientes.map(amb => {
+            const b = calcularBocas(amb);
+            const tabNombre = (tableros.find(t => t.id === amb.tablero) || {nombre: amb.tablero}).nombre;
+            return [amb.nombre, amb.tipo, amb.area + ' m²', tabNombre, b.iug, b.tug, b.tue];
+        });
+        doc.autoTable({
+            startY: y,
+            head: [['Ambiente', 'Tipo', 'm²', 'Tablero', 'IUG', 'TUG', 'TUE']],
+            body: ambData, theme: 'grid',
+            headStyles: { fillColor: [102, 126, 234], fontSize: 8 },
+            bodyStyles: { fontSize: 8 }
+        });
+        y = doc.lastAutoTable.finalY + 8;
+
+        if (y > 240) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+        doc.text('3. TABLEROS', 15, y); y += 4;
+        const tabData = tableros.map(t => {
+            const padre = t.padre ? (tableros.find(x => x.id === t.padre) || {nombre: t.padre}).nombre : '-';
+            return [t.nombre, t.planta, padre, t.long, t.seccion, (t.iccArriba || 0).toFixed(2), pdcComercial(t.iccArriba || 4.5)];
+        });
+        doc.autoTable({
+            startY: y,
+            head: [['Tablero', 'Planta', 'Padre', 'Long', 'Secc.', 'Icc (kA)', 'PdC (kA)']],
+            body: tabData, theme: 'grid',
+            headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
+            bodyStyles: { fontSize: 7 }
+        });
+        y = doc.lastAutoTable.finalY + 8;
+
+        if (y > 200) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+        doc.text('4. CIRCUITOS', 15, y); y += 4;
+        const circData = [];
+        Object.keys(circuitosPorTablero).forEach(tid => {
+            circuitosPorTablero[tid].forEach(c => {
+                const caida = calcularCaidaTension(c.dpms / 220, c.longitud, c.seccion, c.tipo);
+                const iccAbajo = calcularIccAguasAbajo(c.iccArriba, c.longitud, c.seccion);
+                circData.push([c.nombre, c.tablero, c.tipo, c.bocas, c.seccion, c.proteccion, c.longitud, caida.toFixed(1) + '%', pdcComercial(iccAbajo)]);
+            });
+        });
+        doc.autoTable({
+            startY: y,
+            head: [['Cto', 'Tablero', 'Tipo', 'Bocas', 'Secc', 'Prot', 'Long', 'ΔU', 'PdC']],
+            body: circData, theme: 'grid',
+            headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
+            bodyStyles: { fontSize: 7 }
+        });
+        y = doc.lastAutoTable.finalY + 8;
+
+        const motData = [];
+        Object.keys(circuitosPorTablero).forEach(tid => {
+            circuitosPorTablero[tid].forEach(c => {
+                if (c.tipo === 'TUE') {
+                    const r = calcularArranqueMotor(2800, c.longitud, c.seccion, 'directo');
+                    motData.push([c.nombre, c.tablero, r.corrienteNominal.toFixed(1), r.corrienteArranque.toFixed(1), c.longitud, r.caidaNominal.toFixed(2) + '%', r.caidaArranque.toFixed(2) + '%']);
+                }
+            });
+        });
+        if (motData.length > 0) {
+            if (y > 220) { doc.addPage(); y = 20; }
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+            doc.text('5. ARRANQUE DE MOTORES', 15, y); y += 4;
+            doc.autoTable({
+                startY: y,
+                head: [['Circuito', 'Tablero', 'I Nom', 'I Arr', 'Long', 'ΔU Rég', 'ΔU Arr']],
+                body: motData, theme: 'grid',
+                headStyles: { fillColor: [102, 126, 234], fontSize: 8 },
+                bodyStyles: { fontSize: 8 }
+            });
+            y = doc.lastAutoTable.finalY + 8;
+        }
+
+        if (y > 200) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+        doc.text('6. MATERIALES', 15, y); y += 4;
+        const matData = [];
+        document.querySelectorAll('#tbodyMateriales tr').forEach(tr => {
+            const celdas = tr.querySelectorAll('td');
+            if (celdas.length >= 5) matData.push([celdas[0].textContent.trim(), celdas[1].textContent.trim(), celdas[2].textContent.trim() + ' ' + celdas[3].textContent.trim()]);
+        });
+        if (matData.length > 0) {
+            doc.autoTable({
+                startY: y,
+                head: [['Categoría', 'Descripción', 'Cantidad']],
+                body: matData, theme: 'grid',
+                headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
+                bodyStyles: { fontSize: 7 },
+                columnStyles: { 1: { cellWidth: 100 } }
+            });
+        }
+
+        // Plano
+        doc.addPage();
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+        doc.text('PLANO DE UBICACIÓN DE BOCAS', 105, 20, { align: 'center' });
+        const canvas = document.getElementById('planoCanvas');
+        if (canvas && planoElementos.length > 0) {
+            try {
+                const imgData = canvas.toDataURL('image/png');
+                const maxW = 180;
+                const ratio = canvas.height / canvas.width;
+                doc.addImage(imgData, 'PNG', 15, 30, maxW, Math.min(maxW * ratio, 240));
+            } catch(e) { doc.setFontSize(10); doc.text('No se pudo incluir la imagen.', 15, 40); }
+        } else {
+            doc.setFontSize(10);
+            doc.setTextColor(120);
+            doc.text('(Sin elementos en el plano)', 105, 40, { align: 'center' });
+        }
+
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(7);
+            doc.setTextColor(150);
+            doc.text('Página ' + i + ' de ' + pageCount, 105, 292, { align: 'center' });
+            doc.text('Diseño orientativo según AEA 90364-7-770. Consultar con profesional matriculado.', 105, 296, { align: 'center' });
+        }
+
+        doc.save('Diseño_Electrico_AEA770_v8_local.pdf');
+        mostrarToast('✅ PDF exportado correctamente');
+    } catch(e) {
+        console.error('Error al exportar PDF:', e);
+        alert('❌ Error al exportar PDF:\n' + e.message);
+    }
+}
+
+// ============================================================
+// INICIALIZACIÓN
+// ============================================================
+document.getElementById('supCubierta').addEventListener('input', renderizarTodo);
+document.getElementById('supSemicubierta').addEventListener('input', renderizarTodo);
+document.getElementById('iccOrigen').addEventListener('input', renderizarTodo);
+document.getElementById('nombreProyecto').addEventListener('input', () => {
+    if (proyectoActualId) {
+        const proyectos = obtenerProyectos();
+        if (proyectos[proyectoActualId]) {
+            proyectos[proyectoActualId].nombre = document.getElementById('nombreProyecto').value;
+            guardarProyectos(proyectos);
+        }
+    }
+});
+
+actualizarSelectorProyectos();
+
+const proyectosExistentes = obtenerProyectos();
+const idsProyectos = Object.keys(proyectosExistentes);
+if (idsProyectos.length > 0) {
+    if (confirm('Se encontraron ' + idsProyectos.length + ' proyecto(s). ¿Cargar el último?')) {
+        const ultimoId = idsProyectos[idsProyectos.length - 1];
+        proyectoActualId = ultimoId;
+        document.getElementById('selectorProyecto').value = ultimoId;
+        aplicarProyecto(proyectosExistentes[ultimoId]);
+    } else {
+        inicializarEjemplo();
+    }
+} else {
+    inicializarEjemplo();
+}
+
+function inicializarEjemplo() {
+    ambientes = [
+        { nombre: 'Estar-Comedor', tipo: 'Habitación', area: 24, tablero: 'Principal' },
+        { nombre: 'Cocina', tipo: 'Cocina', area: 10, tablero: 'Principal' },
+        { nombre: 'Baño 1', tipo: 'Baño', area: 4, tablero: 'Principal' },
+        { nombre: 'Dormitorio 1', tipo: 'Dormitorio', area: 15, tablero: 'T1' },
+        { nombre: 'Dormitorio 2', tipo: 'Dormitorio', area: 12, tablero: 'T1' },
+        { nombre: 'Baño 2', tipo: 'Baño', area: 3, tablero: 'T1' }
+    ];
+    tableros = [
+        { id: 'Principal', nombre: 'Tablero Principal', planta: 'PB', long: 0, seccion: 4, iccArriba: 4.5, padre: null },
+        { id: 'T1', nombre: 'Tablero Planta Alta', planta: 'PA', long: 15, seccion: 4, iccArriba: null, padre: 'Principal' }
+    ];
+    contadorTableros = 1;
+    renderizarTodo();
+    setTimeout(() => { inicializarPlano(); dibujarPlano(); actualizarContadoresPlano(); }, 200);
+}
+</script>
+</body>
+</html>
