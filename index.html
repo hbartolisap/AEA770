@@ -135,7 +135,6 @@ header {
 }
 .proyecto-selector option { color: #333; }
 
-/* Responsive: en pantallas chicas, apilar todo */
 @media (max-width: 900px) {
     header {
         grid-template-columns: 1fr;
@@ -361,9 +360,7 @@ body.dark #planoCanvas { background: #2a2a3e; }
     margin-left: 10px;
 }
 
-/* ===== CORRECCIÓN DE LAYOUT (solo botones de arriba a la derecha) ===== */
-/* Los inputs/selects de datos mantienen su estilo original (width:100%) */
-/* Se fuerza a los controles del header a no heredar ese width:100% */
+/* ===== CORRECCIÓN DE LAYOUT ===== */
 .header-right button,
 .header-right .proyecto-selector,
 .header-left .proyecto-selector {
@@ -373,7 +370,6 @@ body.dark #planoCanvas { background: #2a2a3e; }
 .header-right button {
     flex: 0 0 auto;
 }
-/* En pantallas chicas los botones se acomodan (wrap) pero no se estiran */
 @media (max-width: 900px) {
     .header-right {
         flex-wrap: wrap;
@@ -388,7 +384,6 @@ body.dark #planoCanvas { background: #2a2a3e; }
     .proyecto-selector { max-width: 100%; }
 }
 
-/* Estas clases faltaban y el HTML las usa: evitan que todo se vea descolocado */
 .step {
     padding: 20px 30px;
     border-bottom: 1px solid var(--border);
@@ -413,8 +408,6 @@ body.dark #planoCanvas { background: #2a2a3e; }
 @media (max-width: 700px) {
     .form-row { flex-direction: column; }
     header h1 { font-size: 1.2em; }
-    .header-buttons { position: static; max-width: 100%; justify-content: center; margin-top: 10px; }
-    .proyecto-selector { position: static; margin-top: 10px; width: 100%; }
     .stat .value { font-size: 1.2em; }
 }
 </style>
@@ -429,7 +422,6 @@ body.dark #planoCanvas { background: #2a2a3e; }
     </div>
     <div class="header-center">
         <h1>⚡ AEA 770 - Suite v8</h1>
-
         <p>100% offline · PWA instalable · Sin dependencias externas</p>
     </div>
     <div class="header-right">
@@ -438,12 +430,12 @@ body.dark #planoCanvas { background: #2a2a3e; }
         <button onclick="document.getElementById('inputFileJSON').click()">📁 Importar</button>
         <button onclick="abrirModalJSON('exportar')">📤 JSON</button>
         <button onclick="abrirModalJSON('importar')">📥 Pegar</button>
+        <button onclick="abrirRepartoTableros()" title="Reparto de circuitos por tablero">🔀 Reparto</button>
         <button onclick="toggleTema()">🌙</button>
     </div>
     <input type="file" id="inputFileJSON" accept=".json" style="display:none;" onchange="importarArchivoJSON(this)">
     </header>
 
-    <!-- BANNER DE INSTALACIÓN PWA -->
     <div id="installBanner">
         📲 Instalá esta app en tu dispositivo para usarla sin conexión.
         <button onclick="instalarPWA()">Instalar</button>
@@ -725,6 +717,7 @@ body.dark #planoCanvas { background: #2a2a3e; }
         <button class="export" onclick="exportarExcel()">📥 Excel</button>
         <button class="export" onclick="exportarPDF()">📄 PDF</button>
         <button class="info" onclick="exportarJSON()">📤 JSON</button>
+        <button class="info" onclick="abrirRepartoTableros()">🔀 Reparto de Tableros</button>
         <button class="success" onclick="guardarProyecto()">💾 Guardar</button>
         <button class="danger" onclick="resetear()">🔄 Reiniciar</button>
     </div>
@@ -957,8 +950,17 @@ function agregarAmbiente() {
     const tipo = document.getElementById('nuevoTipo').value;
     const area = parseFloat(document.getElementById('nuevoArea').value);
     const tablero = document.getElementById('nuevoTablero').value;
+
     if (!nombre) { alert('Ingresá un nombre.'); return; }
     if (!area || area <= 0) { alert('Ingresá una superficie válida.'); return; }
+
+    if (tableros.length < 2) {
+        alert('⚠️ Creá el tablero adicional primero.\n\n' +
+              'Para asignar este ambiente a otro tablero, andá al Paso 3: Tableros ' +
+              'y agregá al menos un tablero seccional.');
+        return;
+    }
+
     if (!tablero) { alert('Seleccioná un tablero.'); return; }
     ambientes.push({ nombre, tipo, area, tablero });
     document.getElementById('nuevoNombre').value = '';
@@ -983,6 +985,32 @@ function actualizarBocas(index, campo, valor) {
     } else {
         amb[campo + 'Real'] = num;
     }
+    renderizarTodo();
+}
+
+// ============================================================
+// CAMBIO DE TABLERO DE UN AMBIENTE
+// ============================================================
+function opcionesTablerosAmbiente(seleccionado) {
+    return tableros.map(t =>
+        `<option value="${t.id}" ${t.id === seleccionado ? 'selected' : ''}>${t.nombre}</option>`
+    ).join('');
+}
+
+function cambiarTableroAmbiente(index, nuevoTableroId) {
+    const amb = ambientes[index];
+    if (!amb) return;
+
+    if (tableros.length < 2) {
+        alert('⚠️ Creá el tablero adicional primero.\n\n' +
+              'Para asignar ambientes a otro tablero, andá al Paso 3: Tableros ' +
+              'y agregá al menos un tablero seccional.');
+        renderizarTodo();
+        return;
+    }
+
+    if (!tableros.find(t => t.id === nuevoTableroId)) return;
+    amb.tablero = nuevoTableroId;
     renderizarTodo();
 }
 
@@ -1042,7 +1070,6 @@ function renderizarTodo() {
     tbody.innerHTML = ambientes.map((amb, i) => {
         const b = calcularBocas(amb);
         totalIUG += b.iug; totalTUG += b.tug; totalTUE += b.tue;
-        const tabNombre = (tableros.find(t => t.id === amb.tablero) || {nombre: amb.tablero}).nombre;
 
         const extraIUG = b.iug - b.minIUG;
         const extraTUG = b.tug - b.minTUG;
@@ -1055,7 +1082,12 @@ function renderizarTodo() {
             <td><strong>${amb.nombre}</strong></td>
             <td>${amb.tipo}</td>
             <td>${amb.area}</td>
-            <td><span class="marca-badge">${tabNombre}</span></td>
+            <td>
+                <select onchange="cambiarTableroAmbiente(${i}, this.value)"
+                        style="padding:4px 6px;font-size:0.85em;border-radius:6px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);max-width:140px;">
+                    ${opcionesTablerosAmbiente(amb.tablero)}
+                </select>
+            </td>
             <td>
                 <div class="bocas-input-wrap">
                     <span class="bocas-min">mín: ${b.minIUG}</span>
@@ -2096,8 +2128,6 @@ function capturarProyecto() {
 }
 
 function aplicarProyecto(p) {
-    console.log('📥 Aplicando proyecto:', p.nombre || 'sin nombre');
-
     document.getElementById('nombreProyecto').value = p.nombre || 'Mi Vivienda';
     document.getElementById('supCubierta').value = p.supCubierta || 94;
     document.getElementById('supSemicubierta').value = p.supSemicubierta || 4;
@@ -2105,7 +2135,6 @@ function aplicarProyecto(p) {
     document.getElementById('marcaInterruptores').value = p.marca || 'Schneider';
     document.getElementById('tipoInstalacion').value = p.tipoInstalacion || 'embutida';
 
-    // === MIGRACIÓN DE TABLEROS ===
     let tablerosMigrados = Array.isArray(p.tableros) ? p.tableros.slice() : [];
     if (tablerosMigrados.length === 0) {
         tablerosMigrados = [{
@@ -2115,7 +2144,6 @@ function aplicarProyecto(p) {
     }
     const tieneFormatoNuevo = tablerosMigrados.every(t => t.padre !== undefined);
     if (!tieneFormatoNuevo) {
-        console.warn('🔧 Migrando formato viejo de tableros...');
         const principal = tablerosMigrados.find(t => t.id === 'Principal') || tablerosMigrados[0];
         principal.padre = null;
         principal.planta = principal.planta || 'PB';
@@ -2129,10 +2157,7 @@ function aplicarProyecto(p) {
     tablerosMigrados = tablerosMigrados.filter(t => t.id && t.nombre);
     const idsVistos = new Set();
     tablerosMigrados = tablerosMigrados.filter(t => {
-        if (idsVistos.has(t.id)) {
-            console.warn('⚠️ Tablero duplicado eliminado:', t.id);
-            return false;
-        }
+        if (idsVistos.has(t.id)) return false;
         idsVistos.add(t.id);
         return true;
     });
@@ -2145,7 +2170,6 @@ function aplicarProyecto(p) {
     });
     const tienePrincipal = tablerosMigrados.some(t => !t.padre);
     if (!tienePrincipal) {
-        console.warn('⚠️ No hay tablero principal, creando uno...');
         tablerosMigrados.unshift({
             id: 'Principal', nombre: 'Tablero Principal', planta: 'PB',
             long: 0, seccion: 4, iccArriba: 4.5, padre: null
@@ -2154,62 +2178,49 @@ function aplicarProyecto(p) {
     const idsValidos = new Set(tablerosMigrados.map(t => t.id));
     tablerosMigrados.forEach(t => {
         if (t.padre && !idsValidos.has(t.padre)) {
-            console.warn('⚠️ Tablero "' + t.nombre + '" con padre inválido. Reasignando al principal');
             const principal = tablerosMigrados.find(x => !x.padre);
             t.padre = principal ? principal.id : null;
         }
     });
     tableros = tablerosMigrados;
-    console.log('✅ Tableros cargados:', tableros.length);
 
-    // === AMBIENTES ===
     ambientes = Array.isArray(p.ambientes) ? p.ambientes.slice() : [];
     const principalId = tableros.find(t => !t.padre).id;
     ambientes.forEach(a => {
         if (!a.tablero || !tableros.find(t => t.id === a.tablero)) {
-            console.warn('⚠️ Ambiente "' + a.nombre + '" con tablero inválido. Reasignando al principal');
             a.tablero = principalId;
         }
         ['iugReal', 'tugReal', 'tueReal'].forEach(k => {
             if (a[k] !== undefined && (typeof a[k] !== 'number' || isNaN(a[k]))) delete a[k];
         });
     });
-    console.log('✅ Ambientes cargados:', ambientes.length);
 
-    // === CIRCUITOS ===
     circuitosPorTablero = {};
     const cpt = p.circuitosPorTablero || {};
     tableros.forEach(t => {
         circuitosPorTablero[t.id] = Array.isArray(cpt[t.id]) ? cpt[t.id] : [];
     });
-    console.log('✅ Circuitos cargados');
 
-    // === PLANO ===
     planoElementos = Array.isArray(p.planoElementos) ? p.planoElementos.slice() : [];
     planoElementos = planoElementos.filter(el =>
         el && typeof el.x === 'number' && typeof el.y === 'number' && el.tipo
     );
 
-    // === CONTADOR ===
     contadorTableros = p.contadorTableros || 1;
     tableros.forEach(t => {
         const num = parseInt(String(t.id).replace('T', ''));
         if (!isNaN(num) && num > contadorTableros) contadorTableros = num;
     });
 
-    // === MODO OSCURO ===
     if (p.modoOscuro !== undefined && p.modoOscuro !== modoOscuro) toggleTema();
 
-    // === RENDERIZAR ===
     try {
         renderizarTodo();
-        console.log('✅ Renderizado OK');
     } catch(e) {
         console.error('❌ Error al renderizar:', e);
         alert('Error al renderizar el proyecto: ' + e.message);
     }
 
-    // === LIMPIAR TABLEROS VACÍOS ===
     setTimeout(() => {
         const tablerosVacios = tableros.filter(t =>
             t.padre &&
@@ -2217,7 +2228,6 @@ function aplicarProyecto(p) {
             !ambientes.some(a => a.tablero === t.id)
         );
         if (tablerosVacios.length > 0) {
-            console.log('🧹 Eliminando tableros vacíos:', tablerosVacios.map(t => t.nombre));
             tablerosVacios.forEach(t => {
                 const idx = tableros.indexOf(t);
                 if (idx >= 0) tableros.splice(idx, 1);
@@ -2377,6 +2387,24 @@ function ejecutarAccionJSON() {
 function exportarJSON() { abrirModalJSON('exportar'); }
 
 // ============================================================
+// ABRIR REPARTO DE TABLEROS (reparto_tableros.html)
+// ============================================================
+function abrirRepartoTableros() {
+    try {
+        const id = proyectoActualId || 'proy_temp_reparto';
+        const proyectos = obtenerProyectos();
+        proyectos[id] = capturarProyecto();
+        guardarProyectos(proyectos);
+        proyectoActualId = id;
+        document.getElementById('selectorProyecto').value = id;
+        mostrarToast('💾 Proyecto guardado antes de abrir Reparto');
+    } catch(e) {
+        console.warn('No se pudo autoguardar antes de abrir Reparto:', e);
+    }
+    window.open('reparto_tableros.html', '_blank');
+}
+
+// ============================================================
 // TOAST
 // ============================================================
 function mostrarToast(mensaje) {
@@ -2388,260 +2416,315 @@ function mostrarToast(mensaje) {
 }
 
 // ============================================================
-// EXPORTAR EXCEL
+// ASEGURAR DATOS DE EXPORTACIÓN
 // ============================================================
-function exportarExcel() {
-    const wb = XLSX.utils.book_new();
-    const d = window.__datosExport || {};
-    const iccOrigen = parseFloat(document.getElementById('iccOrigen').value) || 4.5;
+function asegurarDatosExport() {
+    if (ambientes.length === 0) {
+        alert('⚠️ No hay ambientes cargados. Agregá ambientes antes de exportar.');
+        return false;
+    }
+    // Si __datosExport no está completo, forzar el recálculo
+    if (!window.__datosExport || window.__datosExport.dpmsFinal === undefined) {
+        renderizarDPMS();
+    }
+    return true;
+}
 
-    const hoja1 = [
-        ['DISEÑO ELÉCTRICO AEA 770 - v8 Local'],
-        ['Proyecto:', document.getElementById('nombreProyecto').value],
-        ['Fecha:', new Date().toLocaleDateString('es-AR')],
-        [],
-        ['DATOS GENERALES'],
-        ['Superficie Cubierta (m²)', parseFloat(document.getElementById('supCubierta').value)],
-        ['Superficie Semicubierta (m²)', parseFloat(document.getElementById('supSemicubierta').value)],
-        ['Sla (m²)', calcularSla().toFixed(2)],
-        ['Grado', document.getElementById('gradoResult').value],
-        ['Marca', document.getElementById('marcaInterruptores').value],
-        ['Icc Origen (kA)', iccOrigen],
-        [],
-        ['TOTALES'],
-        ['Bocas IUG', d.totalIUG || 0],
-        ['Bocas TUG', d.totalTUG || 0],
-        ['Bocas TUE', d.totalTUE || 0],
-        ['Circuitos IUG', d.totalCircIUG || 0],
-        ['Circuitos TUG', d.totalCircTUG || 0],
-        ['Circuitos TUE', d.totalCircTUE || 0],
-        ['DPMS Total (VA)', (d.dpmsTotal || 0).toFixed(0)],
-        ['DPMS Final (VA)', (d.dpmsFinal || 0).toFixed(0)]
-    ];
-    const ws1 = XLSX.utils.aoa_to_sheet(hoja1);
-    ws1['!cols'] = [{wch:30},{wch:20}];
-    XLSX.utils.book_append_sheet(wb, ws1, 'Datos Generales');
-
-    const hoja2 = [['Ambiente', 'Tipo', 'Superficie (m²)', 'Tablero', 'IUG mín', 'IUG real', 'TUG mín', 'TUG real', 'TUE mín', 'TUE real']];
-    ambientes.forEach(amb => {
-        const b = calcularBocas(amb);
-        const tabNombre = (tableros.find(t => t.id === amb.tablero) || {nombre: amb.tablero}).nombre;
-        hoja2.push([amb.nombre, amb.tipo, amb.area, tabNombre, b.minIUG, b.iug, b.minTUG, b.tug, b.minTUE, b.tue]);
-    });
-    const ws2 = XLSX.utils.aoa_to_sheet(hoja2);
-    ws2['!cols'] = [{wch:22},{wch:16},{wch:14},{wch:20},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8}];
-    XLSX.utils.book_append_sheet(wb, ws2, 'Ambientes');
-
-    const hoja3 = [['Circuito', 'Tablero', 'Tipo', 'Bocas', 'DPMS', 'Secc.', 'Prot.', 'Long.', 'ΔU (%)', 'Icc Abajo', 'PdC']];
-    Object.keys(circuitosPorTablero).forEach(tid => {
-        circuitosPorTablero[tid].forEach(c => {
-            const caida = calcularCaidaTension(c.dpms / 220, c.longitud, c.seccion, c.tipo);
-            const iccAbajo = calcularIccAguasAbajo(c.iccArriba, c.longitud, c.seccion);
-            const tabNombre = (tableros.find(t => t.id === c.tablero) || {nombre: c.tablero}).nombre;
-            hoja3.push([c.nombre, tabNombre, c.tipo, c.bocas, c.dpms, c.seccion, c.proteccion, c.longitud, caida.toFixed(2), iccAbajo.toFixed(2), pdcComercial(iccAbajo)]);
-        });
-    });
-    const ws3 = XLSX.utils.aoa_to_sheet(hoja3);
-    ws3['!cols'] = [{wch:8},{wch:20},{wch:8},{wch:8},{wch:10},{wch:8},{wch:8},{wch:8},{wch:10},{wch:12},{wch:8}];
-    XLSX.utils.book_append_sheet(wb, ws3, 'Circuitos');
-
-    const hoja4 = [['Circuito TUE', 'Tablero', 'Potencia (W)', 'Corriente Nominal (A)', 'Corriente Arranque (A)', 'Longitud (m)', 'Sección', 'ΔU Régimen (%)', 'ΔU Arranque (%)']];
-    Object.keys(circuitosPorTablero).forEach(tid => {
-        circuitosPorTablero[tid].forEach(c => {
-            if (c.tipo === 'TUE') {
-                const r = calcularArranqueMotor(2800, c.longitud, c.seccion, 'directo');
-                const tabNombre = (tableros.find(t => t.id === c.tablero) || {nombre: c.tablero}).nombre;
-                hoja4.push([c.nombre, tabNombre, 2800, r.corrienteNominal.toFixed(2), r.corrienteArranque.toFixed(2), c.longitud, c.seccion, r.caidaNominal.toFixed(2), r.caidaArranque.toFixed(2)]);
-            }
-        });
-    });
-    const ws4 = XLSX.utils.aoa_to_sheet(hoja4);
-    ws4['!cols'] = [{wch:12},{wch:20},{wch:12},{wch:18},{wch:20},{wch:10},{wch:10},{wch:14},{wch:15}];
-    XLSX.utils.book_append_sheet(wb, ws4, 'Motores');
-
-    const hoja5 = [['Tablero', 'Planta', 'Padre', 'Longitud (m)', 'Sección', 'Icc Arriba (kA)', 'PdC (kA)']];
-    tableros.forEach(t => {
-        const padre = t.padre ? (tableros.find(x => x.id === t.padre) || {nombre: t.padre}).nombre : '(Acometida)';
-        hoja5.push([t.nombre, t.planta, padre, t.long, t.seccion, t.iccArriba.toFixed(2), pdcComercial(t.iccArriba)]);
-    });
-    const ws5 = XLSX.utils.aoa_to_sheet(hoja5);
-    ws5['!cols'] = [{wch:30},{wch:10},{wch:25},{wch:15},{wch:10},{wch:15},{wch:10}];
-    XLSX.utils.book_append_sheet(wb, ws5, 'Tableros');
-
-    const hoja6 = [['Categoría', 'Descripción', 'Cantidad', 'Unidad', 'Notas']];
-    document.querySelectorAll('#tbodyMateriales tr').forEach(tr => {
-        const celdas = tr.querySelectorAll('td');
-        if (celdas.length >= 5) hoja6.push([...celdas].map(td => td.textContent.trim()));
-    });
-    const ws6 = XLSX.utils.aoa_to_sheet(hoja6);
-    ws6['!cols'] = [{wch:15},{wch:55},{wch:10},{wch:10},{wch:35}];
-    XLSX.utils.book_append_sheet(wb, ws6, 'Materiales');
-
-    const hoja7 = [['Tipo', 'Ambiente', 'X (m)', 'Y (m)']];
-    planoElementos.forEach(el => {
-        hoja7.push([el.tipo, el.ambiente || '-', (el.x / ESCALA_PLANO).toFixed(2), (el.y / ESCALA_PLANO).toFixed(2)]);
-    });
-    const ws7 = XLSX.utils.aoa_to_sheet(hoja7);
-    ws7['!cols'] = [{wch:15},{wch:20},{wch:12},{wch:12}];
-    XLSX.utils.book_append_sheet(wb, ws7, 'Plano');
-
-    const hoja8 = [['Estado', 'Detalle']];
-    document.querySelectorAll('#verificaciones > div').forEach(div => {
-        const badge = div.querySelector('.badge');
-        const texto = div.textContent.replace(badge.textContent, '').trim();
-        hoja8.push([badge.classList.contains('ok') ? 'OK' : badge.classList.contains('warn') ? 'ADVERTENCIA' : 'ERROR', texto]);
-    });
-    const ws8 = XLSX.utils.aoa_to_sheet(hoja8);
-    ws8['!cols'] = [{wch:15},{wch:90}];
-    XLSX.utils.book_append_sheet(wb, ws8, 'Verificaciones');
-
-    XLSX.writeFile(wb, 'Diseño_Electrico_AEA770_v8_local.xlsx');
+function verificarLibrerias(tipo) {
+    if (tipo === 'excel' && typeof XLSX === 'undefined') {
+        alert('❌ La librería XLSX no está cargada.\n\nVerificá que exista el archivo:\nlibs/xlsx.full.min.js');
+        return false;
+    }
+    if (tipo === 'pdf') {
+        if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+            alert('❌ La librería jsPDF no está cargada.\n\nVerificá que exista el archivo:\nlibs/jspdf.umd.min.js');
+            return false;
+        }
+    }
+    return true;
 }
 
 // ============================================================
-// EXPORTAR PDF
+// EXPORTAR EXCEL (CORREGIDO)
+// ============================================================
+function exportarExcel() {
+    if (!verificarLibrerias('excel')) return;
+    if (!asegurarDatosExport()) return;
+
+    try {
+        const wb = XLSX.utils.book_new();
+        const d = window.__datosExport || {};
+        const iccOrigen = parseFloat(document.getElementById('iccOrigen').value) || 4.5;
+
+        const hoja1 = [
+            ['DISEÑO ELÉCTRICO AEA 770 - v8 Local'],
+            ['Proyecto:', document.getElementById('nombreProyecto').value],
+            ['Fecha:', new Date().toLocaleDateString('es-AR')],
+            [],
+            ['DATOS GENERALES'],
+            ['Superficie Cubierta (m²)', parseFloat(document.getElementById('supCubierta').value)],
+            ['Superficie Semicubierta (m²)', parseFloat(document.getElementById('supSemicubierta').value)],
+            ['Sla (m²)', calcularSla().toFixed(2)],
+            ['Grado', document.getElementById('gradoResult').value],
+            ['Marca', document.getElementById('marcaInterruptores').value],
+            ['Icc Origen (kA)', iccOrigen],
+            [],
+            ['TOTALES'],
+            ['Bocas IUG', d.totalIUG || 0],
+            ['Bocas TUG', d.totalTUG || 0],
+            ['Bocas TUE', d.totalTUE || 0],
+            ['Circuitos IUG', d.totalCircIUG || 0],
+            ['Circuitos TUG', d.totalCircTUG || 0],
+            ['Circuitos TUE', d.totalCircTUE || 0],
+            ['DPMS Total (VA)', (d.dpmsTotal || 0).toFixed(0)],
+            ['DPMS Final (VA)', (d.dpmsFinal || 0).toFixed(0)]
+        ];
+        const ws1 = XLSX.utils.aoa_to_sheet(hoja1);
+        ws1['!cols'] = [{wch:30},{wch:20}];
+        XLSX.utils.book_append_sheet(wb, ws1, 'Datos Generales');
+
+        const hoja2 = [['Ambiente', 'Tipo', 'Superficie (m²)', 'Tablero', 'IUG mín', 'IUG real', 'TUG mín', 'TUG real', 'TUE mín', 'TUE real']];
+        ambientes.forEach(amb => {
+            const b = calcularBocas(amb);
+            const tabNombre = (tableros.find(t => t.id === amb.tablero) || {nombre: amb.tablero}).nombre;
+            hoja2.push([amb.nombre, amb.tipo, amb.area, tabNombre, b.minIUG, b.iug, b.minTUG, b.tug, b.minTUE, b.tue]);
+        });
+        const ws2 = XLSX.utils.aoa_to_sheet(hoja2);
+        ws2['!cols'] = [{wch:22},{wch:16},{wch:14},{wch:20},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8}];
+        XLSX.utils.book_append_sheet(wb, ws2, 'Ambientes');
+
+        const hoja3 = [['Circuito', 'Tablero', 'Tipo', 'Bocas', 'DPMS', 'Secc.', 'Prot.', 'Long.', 'ΔU (%)', 'Icc Abajo', 'PdC']];
+        Object.keys(circuitosPorTablero).forEach(tid => {
+            circuitosPorTablero[tid].forEach(c => {
+                const caida = calcularCaidaTension(c.dpms / 220, c.longitud, c.seccion, c.tipo);
+                const iccAbajo = calcularIccAguasAbajo(c.iccArriba, c.longitud, c.seccion);
+                const tabNombre = (tableros.find(t => t.id === c.tablero) || {nombre: c.tablero}).nombre;
+                hoja3.push([c.nombre, tabNombre, c.tipo, c.bocas, c.dpms, c.seccion, c.proteccion, c.longitud, caida.toFixed(2), iccAbajo.toFixed(2), pdcComercial(iccAbajo)]);
+            });
+        });
+        const ws3 = XLSX.utils.aoa_to_sheet(hoja3);
+        ws3['!cols'] = [{wch:8},{wch:20},{wch:8},{wch:8},{wch:10},{wch:8},{wch:8},{wch:8},{wch:10},{wch:12},{wch:8}];
+        XLSX.utils.book_append_sheet(wb, ws3, 'Circuitos');
+
+        const hoja4 = [['Circuito TUE', 'Tablero', 'Potencia (W)', 'Corriente Nominal (A)', 'Corriente Arranque (A)', 'Longitud (m)', 'Sección', 'ΔU Régimen (%)', 'ΔU Arranque (%)']];
+        Object.keys(circuitosPorTablero).forEach(tid => {
+            circuitosPorTablero[tid].forEach(c => {
+                if (c.tipo === 'TUE') {
+                    const r = calcularArranqueMotor(2800, c.longitud, c.seccion, 'directo');
+                    const tabNombre = (tableros.find(t => t.id === c.tablero) || {nombre: c.tablero}).nombre;
+                    hoja4.push([c.nombre, tabNombre, 2800, r.corrienteNominal.toFixed(2), r.corrienteArranque.toFixed(2), c.longitud, c.seccion, r.caidaNominal.toFixed(2), r.caidaArranque.toFixed(2)]);
+                }
+            });
+        });
+        const ws4 = XLSX.utils.aoa_to_sheet(hoja4);
+        ws4['!cols'] = [{wch:12},{wch:20},{wch:12},{wch:18},{wch:20},{wch:10},{wch:10},{wch:14},{wch:15}];
+        XLSX.utils.book_append_sheet(wb, ws4, 'Motores');
+
+        const hoja5 = [['Tablero', 'Planta', 'Padre', 'Longitud (m)', 'Sección', 'Icc Arriba (kA)', 'PdC (kA)']];
+        tableros.forEach(t => {
+            const padre = t.padre ? (tableros.find(x => x.id === t.padre) || {nombre: t.padre}).nombre : '(Acometida)';
+            hoja5.push([t.nombre, t.planta, padre, t.long, t.seccion, (t.iccArriba || 0).toFixed(2), pdcComercial(t.iccArriba || 4.5)]);
+        });
+        const ws5 = XLSX.utils.aoa_to_sheet(hoja5);
+        ws5['!cols'] = [{wch:30},{wch:10},{wch:25},{wch:15},{wch:10},{wch:15},{wch:10}];
+        XLSX.utils.book_append_sheet(wb, ws5, 'Tableros');
+
+        const hoja6 = [['Categoría', 'Descripción', 'Cantidad', 'Unidad', 'Notas']];
+        document.querySelectorAll('#tbodyMateriales tr').forEach(tr => {
+            const celdas = tr.querySelectorAll('td');
+            if (celdas.length >= 5) hoja6.push([...celdas].map(td => td.textContent.trim()));
+        });
+        const ws6 = XLSX.utils.aoa_to_sheet(hoja6);
+        ws6['!cols'] = [{wch:15},{wch:55},{wch:10},{wch:10},{wch:35}];
+        XLSX.utils.book_append_sheet(wb, ws6, 'Materiales');
+
+        const hoja7 = [['Tipo', 'Ambiente', 'X (m)', 'Y (m)']];
+        planoElementos.forEach(el => {
+            hoja7.push([el.tipo, el.ambiente || '-', (el.x / ESCALA_PLANO).toFixed(2), (el.y / ESCALA_PLANO).toFixed(2)]);
+        });
+        const ws7 = XLSX.utils.aoa_to_sheet(hoja7);
+        ws7['!cols'] = [{wch:15},{wch:20},{wch:12},{wch:12}];
+        XLSX.utils.book_append_sheet(wb, ws7, 'Plano');
+
+        const hoja8 = [['Estado', 'Detalle']];
+        document.querySelectorAll('#verificaciones > div').forEach(div => {
+            const badge = div.querySelector('.badge');
+            if (!badge) return;
+            const texto = div.textContent.replace(badge.textContent, '').trim();
+            hoja8.push([badge.classList.contains('ok') ? 'OK' : badge.classList.contains('warn') ? 'ADVERTENCIA' : 'ERROR', texto]);
+        });
+        const ws8 = XLSX.utils.aoa_to_sheet(hoja8);
+        ws8['!cols'] = [{wch:15},{wch:90}];
+        XLSX.utils.book_append_sheet(wb, ws8, 'Verificaciones');
+
+        XLSX.writeFile(wb, 'Diseño_Electrico_AEA770_v8_local.xlsx');
+        mostrarToast('✅ Excel exportado correctamente');
+    } catch(e) {
+        console.error('Error al exportar Excel:', e);
+        alert('❌ Error al exportar Excel:\n' + e.message);
+    }
+}
+
+// ============================================================
+// EXPORTAR PDF (CORREGIDO)
 // ============================================================
 function exportarPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const fecha = new Date().toLocaleDateString('es-AR');
-    const d = window.__datosExport || {};
-    const iccOrigen = parseFloat(document.getElementById('iccOrigen').value) || 4.5;
+    if (!verificarLibrerias('pdf')) return;
+    if (!asegurarDatosExport()) return;
 
-    doc.setFillColor(44, 62, 80);
-    doc.rect(0, 0, 210, 28, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(15);
-    doc.setFont('helvetica', 'bold');
-    doc.text('DISEÑO ELÉCTRICO AEA 770', 105, 12, { align: 'center' });
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(document.getElementById('nombreProyecto').value, 105, 19, { align: 'center' });
-    doc.text('Fecha: ' + fecha + ' | Marca: ' + document.getElementById('marcaInterruptores').value, 105, 25, { align: 'center' });
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const fecha = new Date().toLocaleDateString('es-AR');
+        const d = window.__datosExport || {};
+        const iccOrigen = parseFloat(document.getElementById('iccOrigen').value) || 4.5;
 
-    doc.setTextColor(0, 0, 0);
-    let y = 38;
+        doc.setFillColor(44, 62, 80);
+        doc.rect(0, 0, 210, 28, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(15);
+        doc.setFont('helvetica', 'bold');
+        doc.text('DISEÑO ELÉCTRICO AEA 770', 105, 12, { align: 'center' });
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(document.getElementById('nombreProyecto').value, 105, 19, { align: 'center' });
+        doc.text('Fecha: ' + fecha + ' | Marca: ' + document.getElementById('marcaInterruptores').value, 105, 25, { align: 'center' });
 
-    doc.setFontSize(11); doc.setFont('helvetica', 'bold');
-    doc.text('1. DATOS GENERALES', 15, y); y += 6;
-    doc.setFontSize(9); doc.setFont('helvetica', 'normal');
-    doc.text('Sla: ' + calcularSla().toFixed(2) + ' m² | Grado: ' + document.getElementById('gradoResult').value + ' | Icc Origen: ' + iccOrigen + ' kA', 15, y); y += 8;
+        doc.setTextColor(0, 0, 0);
+        let y = 38;
 
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-    doc.text('2. AMBIENTES', 15, y); y += 4;
-    const ambData = ambientes.map(amb => {
-        const b = calcularBocas(amb);
-        const tabNombre = (tableros.find(t => t.id === amb.tablero) || {nombre: amb.tablero}).nombre;
-        return [amb.nombre, amb.tipo, amb.area + ' m²', tabNombre, b.iug, b.tug, b.tue];
-    });
-    doc.autoTable({
-        startY: y,
-        head: [['Ambiente', 'Tipo', 'm²', 'Tablero', 'IUG', 'TUG', 'TUE']],
-        body: ambData, theme: 'grid',
-        headStyles: { fillColor: [102, 126, 234], fontSize: 8 },
-        bodyStyles: { fontSize: 8 }
-    });
-    y = doc.lastAutoTable.finalY + 8;
+        doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+        doc.text('1. DATOS GENERALES', 15, y); y += 6;
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+        doc.text('Sla: ' + calcularSla().toFixed(2) + ' m² | Grado: ' + document.getElementById('gradoResult').value + ' | Icc Origen: ' + iccOrigen + ' kA', 15, y); y += 8;
 
-    if (y > 240) { doc.addPage(); y = 20; }
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-    doc.text('3. TABLEROS', 15, y); y += 4;
-    const tabData = tableros.map(t => {
-        const padre = t.padre ? (tableros.find(x => x.id === t.padre) || {nombre: t.padre}).nombre : '-';
-        return [t.nombre, t.planta, padre, t.long, t.seccion, t.iccArriba.toFixed(2), pdcComercial(t.iccArriba)];
-    });
-    doc.autoTable({
-        startY: y,
-        head: [['Tablero', 'Planta', 'Padre', 'Long', 'Secc.', 'Icc (kA)', 'PdC (kA)']],
-        body: tabData, theme: 'grid',
-        headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
-        bodyStyles: { fontSize: 7 }
-    });
-    y = doc.lastAutoTable.finalY + 8;
-
-    if (y > 200) { doc.addPage(); y = 20; }
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-    doc.text('4. CIRCUITOS', 15, y); y += 4;
-    const circData = [];
-    Object.keys(circuitosPorTablero).forEach(tid => {
-        circuitosPorTablero[tid].forEach(c => {
-            const caida = calcularCaidaTension(c.dpms / 220, c.longitud, c.seccion, c.tipo);
-            const iccAbajo = calcularIccAguasAbajo(c.iccArriba, c.longitud, c.seccion);
-            circData.push([c.nombre, c.tablero, c.tipo, c.bocas, c.seccion, c.proteccion, c.longitud, caida.toFixed(1) + '%', pdcComercial(iccAbajo)]);
-        });
-    });
-    doc.autoTable({
-        startY: y,
-        head: [['Cto', 'Tablero', 'Tipo', 'Bocas', 'Secc', 'Prot', 'Long', 'ΔU', 'PdC']],
-        body: circData, theme: 'grid',
-        headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
-        bodyStyles: { fontSize: 7 }
-    });
-    y = doc.lastAutoTable.finalY + 8;
-
-    const motData = [];
-    Object.keys(circuitosPorTablero).forEach(tid => {
-        circuitosPorTablero[tid].forEach(c => {
-            if (c.tipo === 'TUE') {
-                const r = calcularArranqueMotor(2800, c.longitud, c.seccion, 'directo');
-                motData.push([c.nombre, c.tablero, r.corrienteNominal.toFixed(1), r.corrienteArranque.toFixed(1), c.longitud, r.caidaNominal.toFixed(2) + '%', r.caidaArranque.toFixed(2) + '%']);
-            }
-        });
-    });
-    if (motData.length > 0) {
-        if (y > 220) { doc.addPage(); y = 20; }
         doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-        doc.text('5. ARRANQUE DE MOTORES', 15, y); y += 4;
+        doc.text('2. AMBIENTES', 15, y); y += 4;
+        const ambData = ambientes.map(amb => {
+            const b = calcularBocas(amb);
+            const tabNombre = (tableros.find(t => t.id === amb.tablero) || {nombre: amb.tablero}).nombre;
+            return [amb.nombre, amb.tipo, amb.area + ' m²', tabNombre, b.iug, b.tug, b.tue];
+        });
         doc.autoTable({
             startY: y,
-            head: [['Circuito', 'Tablero', 'I Nom', 'I Arr', 'Long', 'ΔU Rég', 'ΔU Arr']],
-            body: motData, theme: 'grid',
+            head: [['Ambiente', 'Tipo', 'm²', 'Tablero', 'IUG', 'TUG', 'TUE']],
+            body: ambData, theme: 'grid',
             headStyles: { fillColor: [102, 126, 234], fontSize: 8 },
             bodyStyles: { fontSize: 8 }
         });
         y = doc.lastAutoTable.finalY + 8;
+
+        if (y > 240) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+        doc.text('3. TABLEROS', 15, y); y += 4;
+        const tabData = tableros.map(t => {
+            const padre = t.padre ? (tableros.find(x => x.id === t.padre) || {nombre: t.padre}).nombre : '-';
+            return [t.nombre, t.planta, padre, t.long, t.seccion, (t.iccArriba || 0).toFixed(2), pdcComercial(t.iccArriba || 4.5)];
+        });
+        doc.autoTable({
+            startY: y,
+            head: [['Tablero', 'Planta', 'Padre', 'Long', 'Secc.', 'Icc (kA)', 'PdC (kA)']],
+            body: tabData, theme: 'grid',
+            headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
+            bodyStyles: { fontSize: 7 }
+        });
+        y = doc.lastAutoTable.finalY + 8;
+
+        if (y > 200) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+        doc.text('4. CIRCUITOS', 15, y); y += 4;
+        const circData = [];
+        Object.keys(circuitosPorTablero).forEach(tid => {
+            circuitosPorTablero[tid].forEach(c => {
+                const caida = calcularCaidaTension(c.dpms / 220, c.longitud, c.seccion, c.tipo);
+                const iccAbajo = calcularIccAguasAbajo(c.iccArriba, c.longitud, c.seccion);
+                circData.push([c.nombre, c.tablero, c.tipo, c.bocas, c.seccion, c.proteccion, c.longitud, caida.toFixed(1) + '%', pdcComercial(iccAbajo)]);
+            });
+        });
+        doc.autoTable({
+            startY: y,
+            head: [['Cto', 'Tablero', 'Tipo', 'Bocas', 'Secc', 'Prot', 'Long', 'ΔU', 'PdC']],
+            body: circData, theme: 'grid',
+            headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
+            bodyStyles: { fontSize: 7 }
+        });
+        y = doc.lastAutoTable.finalY + 8;
+
+        const motData = [];
+        Object.keys(circuitosPorTablero).forEach(tid => {
+            circuitosPorTablero[tid].forEach(c => {
+                if (c.tipo === 'TUE') {
+                    const r = calcularArranqueMotor(2800, c.longitud, c.seccion, 'directo');
+                    motData.push([c.nombre, c.tablero, r.corrienteNominal.toFixed(1), r.corrienteArranque.toFixed(1), c.longitud, r.caidaNominal.toFixed(2) + '%', r.caidaArranque.toFixed(2) + '%']);
+                }
+            });
+        });
+        if (motData.length > 0) {
+            if (y > 220) { doc.addPage(); y = 20; }
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+            doc.text('5. ARRANQUE DE MOTORES', 15, y); y += 4;
+            doc.autoTable({
+                startY: y,
+                head: [['Circuito', 'Tablero', 'I Nom', 'I Arr', 'Long', 'ΔU Rég', 'ΔU Arr']],
+                body: motData, theme: 'grid',
+                headStyles: { fillColor: [102, 126, 234], fontSize: 8 },
+                bodyStyles: { fontSize: 8 }
+            });
+            y = doc.lastAutoTable.finalY + 8;
+        }
+
+        if (y > 200) { doc.addPage(); y = 20; }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+        doc.text('6. MATERIALES', 15, y); y += 4;
+        const matData = [];
+        document.querySelectorAll('#tbodyMateriales tr').forEach(tr => {
+            const celdas = tr.querySelectorAll('td');
+            if (celdas.length >= 5) matData.push([celdas[0].textContent.trim(), celdas[1].textContent.trim(), celdas[2].textContent.trim() + ' ' + celdas[3].textContent.trim()]);
+        });
+        if (matData.length > 0) {
+            doc.autoTable({
+                startY: y,
+                head: [['Categoría', 'Descripción', 'Cantidad']],
+                body: matData, theme: 'grid',
+                headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
+                bodyStyles: { fontSize: 7 },
+                columnStyles: { 1: { cellWidth: 100 } }
+            });
+        }
+
+        // Plano
+        doc.addPage();
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+        doc.text('PLANO DE UBICACIÓN DE BOCAS', 105, 20, { align: 'center' });
+        const canvas = document.getElementById('planoCanvas');
+        if (canvas && planoElementos.length > 0) {
+            try {
+                const imgData = canvas.toDataURL('image/png');
+                const maxW = 180;
+                const ratio = canvas.height / canvas.width;
+                doc.addImage(imgData, 'PNG', 15, 30, maxW, Math.min(maxW * ratio, 240));
+            } catch(e) { doc.setFontSize(10); doc.text('No se pudo incluir la imagen.', 15, 40); }
+        } else {
+            doc.setFontSize(10);
+            doc.setTextColor(120);
+            doc.text('(Sin elementos en el plano)', 105, 40, { align: 'center' });
+        }
+
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(7);
+            doc.setTextColor(150);
+            doc.text('Página ' + i + ' de ' + pageCount, 105, 292, { align: 'center' });
+            doc.text('Diseño orientativo según AEA 90364-7-770. Consultar con profesional matriculado.', 105, 296, { align: 'center' });
+        }
+
+        doc.save('Diseño_Electrico_AEA770_v8_local.pdf');
+        mostrarToast('✅ PDF exportado correctamente');
+    } catch(e) {
+        console.error('Error al exportar PDF:', e);
+        alert('❌ Error al exportar PDF:\n' + e.message);
     }
-
-    if (y > 200) { doc.addPage(); y = 20; }
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-    doc.text('6. MATERIALES', 15, y); y += 4;
-    const matData = [];
-    document.querySelectorAll('#tbodyMateriales tr').forEach(tr => {
-        const celdas = tr.querySelectorAll('td');
-        if (celdas.length >= 5) matData.push([celdas[0].textContent.trim(), celdas[1].textContent.trim(), celdas[2].textContent.trim() + ' ' + celdas[3].textContent.trim()]);
-    });
-    doc.autoTable({
-        startY: y,
-        head: [['Categoría', 'Descripción', 'Cantidad']],
-        body: matData, theme: 'grid',
-        headStyles: { fillColor: [102, 126, 234], fontSize: 7 },
-        bodyStyles: { fontSize: 7 },
-        columnStyles: { 1: { cellWidth: 100 } }
-    });
-
-    doc.addPage();
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
-    doc.text('PLANO DE UBICACIÓN DE BOCAS', 105, 20, { align: 'center' });
-    const canvas = document.getElementById('planoCanvas');
-    if (canvas && planoElementos.length > 0) {
-        try {
-            const imgData = canvas.toDataURL('image/png');
-            const maxW = 180;
-            const ratio = canvas.height / canvas.width;
-            doc.addImage(imgData, 'PNG', 15, 30, maxW, Math.min(maxW * ratio, 240));
-        } catch(e) { doc.setFontSize(10); doc.text('No se pudo incluir la imagen.', 15, 40); }
-    }
-
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(7);
-        doc.setTextColor(150);
-        doc.text('Página ' + i + ' de ' + pageCount, 105, 292, { align: 'center' });
-        doc.text('Diseño orientativo según AEA 90364-7-770. Consultar con profesional matriculado.', 105, 296, { align: 'center' });
-    }
-
-    doc.save('Diseño_Electrico_AEA770_v8_local.pdf');
 }
 
 // ============================================================
