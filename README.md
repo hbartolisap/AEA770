@@ -111,4 +111,4 @@ Los cálculos son orientativos. Consultar con un profesional matriculado antes d
 
 ## 📄 Licencia
 
-Uso exclusivo para/y/o Humberto Bartoli 96437257 / Soluciones Profeionales Avanzadas  con fines educativos y profesionales.
+Uso libre para Humberto Bartoli con fines educativos y profesionales.
