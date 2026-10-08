@@ -1,10 +1,10 @@
 {
-  "name": "Diseño Eléctrico AEA 770",
+  "name": "Diseño Eléctrico AEA 770 - Suite v8",
   "short_name": "AEA 770",
-  "description": "Suite de diseño eléctrico para viviendas unifamiliares según AEA 90364-7-770",
-  "start_url": "./",
+  "description": "Suite de diseño eléctrico según AEA 90364-7-770. 100% offline.",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#2c3e50",
+  "background_color": "#667eea",
   "theme_color": "#667eea",
   "orientation": "any",
   "icons": [

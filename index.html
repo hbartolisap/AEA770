@@ -530,6 +530,7 @@ body.dark #planoCanvas { background: #2a2a3e; }
         <button onclick="abrirModalJSON('exportar')">📤 JSON</button>
         <button onclick="abrirModalJSON('importar')">📥 Pegar</button>
         <button onclick="abrirRepartoTableros()" title="Reparto de circuitos por tablero">🔀 Reparto</button>
+        <button onclick="irAModuloDPS()" title="Módulo de Protección contra Sobretensiones">⚡ DPS</button>
         <button onclick="toggleTema()">🌙</button>
     </div>
     <input type="file" id="inputFileJSON" accept=".json" style="display:none;" onchange="importarArchivoJSON(this)">
@@ -884,6 +885,7 @@ body.dark #planoCanvas { background: #2a2a3e; }
             <div class="tab" onclick="cambiarTab(event, 'tab-circuitos')">🔌 Circuitos</div>
             <div class="tab" onclick="cambiarTab(event, 'tab-motores')">🚀 Motores</div>
             <div class="tab" onclick="cambiarTab(event, 'tab-diferenciales')">🧲 Diferenciales</div>
+            <div class="tab" onclick="cambiarTab(event, 'tab-dps')">⚡ DPS</div>
             <div class="tab" onclick="cambiarTab(event, 'tab-alturas')">📏 Alturas</div>
             <div class="tab" onclick="cambiarTab(event, 'tab-materiales')">📦 Materiales</div>
             <div class="tab" onclick="cambiarTab(event, 'tab-plano')">📐 Plano</div>
@@ -947,6 +949,10 @@ body.dark #planoCanvas { background: #2a2a3e; }
 
         <div id="tab-diferenciales" class="tab-content">
             <div id="seccionDiferenciales"></div>
+        </div>
+
+        <div id="tab-dps" class="tab-content">
+            <div id="seccionDPS"></div>
         </div>
 
         <div id="tab-alturas" class="tab-content">
@@ -1134,8 +1140,6 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
 
 // ============================================================
 // LIMPIEZA DE TEXTO PARA jsPDF
-// Reemplaza caracteres especiales no soportados por las fuentes
-// estándar de jsPDF (Helvetica) por equivalentes ASCII.
 // ============================================================
 function limpiarTextoPDF(texto) {
     if (texto === null || texto === undefined) return '';
@@ -1176,7 +1180,6 @@ function limpiarTextoPDF(texto) {
         .replace(/['']/g, "'");
 }
 
-// Wrapper para autoTable que limpia automáticamente head y body
 function autoTableLimpio(doc, opciones) {
     const opt = { ...opciones };
     if (opt.head) {
@@ -1483,7 +1486,7 @@ function obtenerDatosPAT() {
         'acero_cobre': 'Jabalina acero-cobre 3/4" x 2 m'
     };
 
-    return { cantJabalina, longCable, seccion, tipoJabalina, nombreJabalina: nombresJabalina [tipoJabalina] };
+    return { cantJabalina, longCable, seccion, tipoJabalina, nombreJabalina: nombresJabalina[tipoJabalina] };
 }
 
 // ============================================================
@@ -1867,6 +1870,7 @@ function renderizarTodo() {
     renderizarCircuitos();
     renderizarMotores();
     renderizarDiferenciales();
+    renderizarDPS();
     renderizarAlturas();
     renderizarMateriales();
     renderizarVerificaciones();
@@ -2608,6 +2612,100 @@ function renderizarDiferenciales() {
 }
 
 // ============================================================
+// DPS - MÓDULO INTEGRADO
+// ============================================================
+function renderizarDPS() {
+    const div = document.getElementById('seccionDPS');
+    if (!div) return;
+
+    const proyectoNombre = document.getElementById('nombreProyecto').value || 'proyecto';
+    let resultado = null;
+    try {
+        const data = localStorage.getItem('resultadoDPS_' + proyectoNombre);
+        if (data) resultado = JSON.parse(data);
+    } catch (e) {}
+
+    if (!resultado) {
+        div.innerHTML = `
+            <div class="info-tip">
+                ⚡ <strong>Módulo de DPS no evaluado</strong><br>
+                Hacé clic en el botón <strong>⚡ DPS</strong> en la barra superior para evaluar la necesidad de instalar un Dispositivo de Protección contra Sobretensiones.
+            </div>
+            <div style="text-align:center;margin-top:20px;">
+                <button onclick="irAModuloDPS()" class="info">⚡ Ir al Módulo de DPS</button>
+            </div>
+        `;
+        return;
+    }
+
+    const tipoNombre = {
+        1: 'Tipo 1 (Clase B)',
+        2: 'Tipo 2 (Clase C)',
+        3: 'Tipo 3 (Clase D)'
+    }[resultado.tipoRecomendado] || 'No definido';
+
+    const badge = resultado.esObligatorio
+        ? '<span class="badge error">OBLIGATORIO</span>'
+        : '<span class="badge ok">NO OBLIGATORIO (recomendado)</span>';
+
+    let html = `
+        <div class="result-card">
+            <h3>⚡ Evaluación de DPS (AEA 90364-7-771)</h3>
+            <p><strong>Estado:</strong> ${badge}</p>
+            <div class="grid-2" style="margin-top:12px;">
+                <div class="stat">
+                    <div class="value">${resultado.tipoRecomendado}</div>
+                    <div class="label">Tipo de DPS</div>
+                </div>
+                <div class="stat">
+                    <div class="value">${resultado.upRecomendado} kV</div>
+                    <div class="label">Up Recomendado</div>
+                </div>
+                <div class="stat">
+                    <div class="value">${resultado.entrada.tipoAcometida}</div>
+                    <div class="label">Tipo de Acometida</div>
+                </div>
+                <div class="stat">
+                    <div class="value">${resultado.entrada.tienePararrayos === 'si' ? 'Sí' : 'No'}</div>
+                    <div class="label">Posee Pararrayos</div>
+                </div>
+            </div>
+            <p style="margin-top:12px;"><strong>Tipo:</strong> ${tipoNombre}</p>
+        </div>
+    `;
+
+    if (resultado.dispositivos && resultado.dispositivos.length > 0) {
+        html += `
+            <h3 style="margin-top:15px;font-size:0.95em;">📦 DPS Recomendados</h3>
+            <table>
+                <thead>
+                    <tr><th>Modelo</th><th>Polos</th><th>Tipo</th><th>Imax</th><th>Up</th></tr>
+                </thead>
+                <tbody>
+                    ${resultado.dispositivos.map(d => `
+                        <tr>
+                            <td><strong>${d.modelo}</strong></td>
+                            <td>${d.polos}</td>
+                            <td>Tipo ${d.tipo}</td>
+                            <td>${d.Imax} kA</td>
+                            <td><span class="badge ${d.Up <= resultado.upRecomendado ? 'ok' : 'warn'}">${d.Up} kV</span></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    html += `
+        <div style="text-align:center;margin-top:20px;">
+            <button onclick="irAModuloDPS()" class="info">✏️ Editar Evaluación de DPS</button>
+        </div>
+    `;
+
+    div.innerHTML = html;
+}
+
+// ============================================================
 // MATERIALES
 // ============================================================
 function renderizarMateriales() {
@@ -2681,6 +2779,31 @@ function renderizarMateriales() {
     materiales.push(['Diferenciales', cat.ID_30mA, 2, 'unidad', 'TUG + TUE']);
     if (ambientes.some(a => a.tipo === 'Baño')) materiales.push(['Diferenciales', cat.ID_BAÑO, 1, 'unidad', 'Circuito baño']);
     if (tableros.length > 1) materiales.push(['Diferenciales', cat.ID_30mA, tableros.length - 1, 'unidad', 'Cabeceras seccionales']);
+
+    // NUEVO: DPS (si fue evaluado)
+    const proyectoNombre = document.getElementById('nombreProyecto').value || 'proyecto';
+    try {
+        const dpsData = localStorage.getItem('resultadoDPS_' + proyectoNombre);
+        if (dpsData) {
+            const dps = JSON.parse(dpsData);
+            const tipoNombre = {1: 'Tipo 1', 2: 'Tipo 2', 3: 'Tipo 3'}[dps.tipoRecomendado];
+            const modelo = dps.dispositivos && dps.dispositivos[0] ? dps.dispositivos[0].modelo : `DPS ${tipoNombre} (seleccionar modelo)`;
+            materiales.push([
+                'Protección DPS',
+                `${modelo} - Up <= ${dps.upRecomendado} kV`,
+                1,
+                'unidad',
+                dps.esObligatorio ? 'OBLIGATORIO (AEA 771)' : 'Recomendado (AEA 771)'
+            ]);
+            materiales.push([
+                'Protección DPS',
+                'Fusible o PIA de respaldo para DPS',
+                1,
+                'unidad',
+                'Según indicación del fabricante'
+            ]);
+        }
+    } catch (e) { console.warn('DPS no disponible:', e); }
 
     const cablesPorSeccion = {};
     Object.values(circuitosPorTablero).forEach(circs => {
@@ -2867,6 +2990,36 @@ function renderizarVerificaciones() {
     verifs.push({ estado: 'info', texto: `Alturas verificadas: IUG 1.10 m · TUG 0.30/1.10 m · TUE 1.10/2.00 m · TV/datos 0.30/1.10 m · Tableros 1.30-1.80 m.` });
     if (ambientes.some(a => a.tipo === 'Baño')) {
         verifs.push({ estado: 'ok', texto: `Baños: tomas fuera del volumen de seguridad (Sección 701).` });
+    }
+
+    // Verificación DPS
+    const proyectoNombreVerif = document.getElementById('nombreProyecto').value || 'proyecto';
+    try {
+        const dpsData = localStorage.getItem('resultadoDPS_' + proyectoNombreVerif);
+        if (dpsData) {
+            const dps = JSON.parse(dpsData);
+            if (dps.esObligatorio) {
+                verifs.push({
+                    estado: 'info',
+                    texto: `DPS evaluado: OBLIGATORIO según AEA 771. Tipo ${dps.tipoRecomendado}, Up <= ${dps.upRecomendado} kV.`
+                });
+            } else {
+                verifs.push({
+                    estado: 'ok',
+                    texto: `DPS evaluado: no obligatorio, pero recomendado. Tipo ${dps.tipoRecomendado}, Up <= ${dps.upRecomendado} kV.`
+                });
+            }
+        } else {
+            verifs.push({
+                estado: 'warn',
+                texto: `Módulo de DPS no evaluado. Se recomienda abrir el módulo para determinar la necesidad de protección contra sobretensiones.`
+            });
+        }
+    } catch (e) {
+        verifs.push({
+            estado: 'warn',
+            texto: `No se pudo verificar el estado del DPS.`
+        });
     }
 
     document.getElementById('verificaciones').innerHTML = verifs.map(v =>
@@ -3169,7 +3322,7 @@ function exportarPlanoPNG() {
 }
 
 // ============================================================
-// ESQUEMA SVG
+// ESQUEMA SVG - CORREGIDO
 // ============================================================
 function dibujarEsquemaSVG() {
     const container = document.getElementById('svgContainer');
@@ -3181,7 +3334,8 @@ function dibujarEsquemaSVG() {
     const altoNodo = 55;
     const separacion = 12;
     const padding = 25;
-    let altoTotal = padding * 2 + altoNodo * (tableros.length + 3) + separacion * (tableros.length + 3) + 60;
+    // Alto total: espacio para medidor + tableros + DPS + PAT + circuitos
+    let altoTotal = padding * 2 + altoNodo * (tableros.length + 4) + separacion * (tableros.length + 4) + 140;
     Object.values(circuitosPorTablero).forEach(circs => {
         if (circs.length > 0) altoTotal += Math.ceil(circs.length / 6) * 55 + separacion + 15;
     });
@@ -3196,6 +3350,7 @@ function dibujarEsquemaSVG() {
     let y = padding;
     const centroX = ancho / 2;
 
+    // === MEDIDOR ===
     const acom = calcularAcometida();
     svg += `<line x1="${centroX}" y1="0" x2="${centroX}" y2="${y}" stroke="${colorLinea}" stroke-width="3"/>`;
     svg += `<text x="${centroX + 10}" y="${y - 5}" fill="${colorTexto}" font-size="10">Acometida 220/380V</text>`;
@@ -3207,6 +3362,7 @@ function dibujarEsquemaSVG() {
     svg += `<line x1="${centroX}" y1="${y - separacion}" x2="${centroX}" y2="${y}" stroke="${colorLinea}" stroke-width="3"/>`;
     svg += `<text x="${centroX + 15}" y="${y - 5}" fill="${colorTexto}" font-size="9">${acom.long}m · ${acom.conductores}x${acom.seccion}mm2 · ${getNombreTipoCable(acom.tipoCable)}</text>`;
 
+    // === TABLEROS ===
     tableros.forEach(t => {
         const circs = circuitosPorTablero[t.id] || [];
         if (t.padre && circs.length === 0) return;
@@ -3246,9 +3402,26 @@ function dibujarEsquemaSVG() {
         }
     });
 
+    // === BLOQUE DPS (si fue evaluado) ===
+    const proyectoNombreSvg = document.getElementById('nombreProyecto').value || 'proyecto';
+    try {
+        const dpsData = localStorage.getItem('resultadoDPS_' + proyectoNombreSvg);
+        if (dpsData) {
+            const dps = JSON.parse(dpsData);
+            const colorDPS = dps.esObligatorio ? '#e74c3c' : '#f39c12';
+            const xDPS = centroX - 100;
+            const yDPS = y + 20;
+            svg += `<line x1="${centroX}" y1="${y}" x2="${centroX}" y2="${yDPS}" stroke="${colorDPS}" stroke-width="3"/>`;
+            svg += nodoSVG(xDPS, yDPS, 200, 40, colorNodo, colorDPS);
+            svg += `<text x="${centroX}" y="${yDPS + 25}" fill="${colorTexto}" font-size="10" font-weight="bold" text-anchor="middle">DPS Tipo ${dps.tipoRecomendado} - Up <= ${dps.upRecomendado} kV</text>`;
+            y = yDPS + 50;
+        }
+    } catch (e) { console.warn('DPS no disponible para el esquema:', e); }
+
+    // === PAT ===
     const pat = obtenerDatosPAT();
     svg += `<line x1="${padding}" y1="${y}" x2="${ancho - padding}" y2="${y}" stroke="${colorLinea}" stroke-width="2" stroke-dasharray="5,5"/>`;
-    svg += `<text x="${centroX}" y="${y + 18}" fill="${colorTexto}" font-size="10" font-weight="bold" text-anchor="middle">PAT: ${pat.cantJabalina} jabalina(s) · R <= 40 Ohm</text>`;
+    svg += `<text x="${centroX}" y="${y + 18}" fill="${colorTexto}" font-size="10" font-weight="bold" text-anchor="middle">PAT: ${pat.cantJabalina} jabalina(s) - R &lt;= 40 Ohm</text>`;
     svg += `</svg>`;
     container.innerHTML = svg;
 }
@@ -3636,6 +3809,20 @@ function abrirRepartoTableros() {
         console.warn('No se pudo autoguardar antes de abrir Reparto:', e);
     }
     window.open('reparto_tableros.html', '_blank');
+}
+
+// ============================================================
+// IR AL MÓDULO DE DPS
+// ============================================================
+function irAModuloDPS() {
+    try {
+        const proyecto = capturarProyecto();
+        localStorage.setItem('proyectoAEA_para_DPS', JSON.stringify(proyecto));
+        window.location.href = 'dps.html';
+    } catch (e) {
+        console.error('Error al preparar el proyecto para el módulo DPS:', e);
+        alert('❌ No se pudo abrir el módulo de DPS. Revisá la consola para más detalles.');
+    }
 }
 
 // ============================================================
