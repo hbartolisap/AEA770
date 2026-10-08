@@ -49,6 +49,48 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
     cerrarBanner();
 }
 
+
+// ============================================================
+// EXPONER FUNCIONES GLOBALES (para onclick en el HTML)
+// ============================================================
+window.abrirManual = abrirManual;
+window.irAModuloDPS = irAModuloDPS;
+window.abrirRepartoTableros = abrirRepartoTableros;
+window.instalarPWA = instalarPWA;
+window.cerrarBanner = cerrarBanner;
+window.toggleTema = toggleTema;
+window.cambiarTab = cambiarTab;
+window.guardarProyecto = guardarProyecto;
+window.nuevoProyecto = nuevoProyecto;
+window.cambiarProyecto = cambiarProyecto;
+window.resetear = resetear;
+window.abrirModalJSON = abrirModalJSON;
+window.cerrarModalJSON = cerrarModalJSON;
+window.ejecutarAccionJSON = ejecutarAccionJSON;
+window.exportarJSON = exportarJSON;
+window.importarArchivoJSON = importarArchivoJSON;
+window.exportarExcel = exportarExcel;
+window.exportarPDF = exportarPDF;
+window.agregarAmbiente = agregarAmbiente;
+window.eliminarAmbiente = eliminarAmbiente;
+window.actualizarBocas = actualizarBocas;
+window.cambiarTableroAmbiente = cambiarTableroAmbiente;
+window.resetearBocasMinimas = resetearBocasMinimas;
+window.agregarTablero = agregarTablero;
+window.eliminarTablero = eliminarTablero;
+window.actualizarTablero = actualizarTablero;
+window.actualizarSeccionCircuito = actualizarSeccionCircuito;
+window.actualizarProteccionCircuito = actualizarProteccionCircuito;
+window.actualizarLongitudCircuito = actualizarLongitudCircuito;
+window.actualizarPotenciaMotor = actualizarPotenciaMotor;
+window.setHerramienta = setHerramienta;
+window.limpiarPlano = limpiarPlano;
+window.autoUbicarBocas = autoUbicarBocas;
+window.exportarPlanoPNG = exportarPlanoPNG;
+window.actualizarElemento = actualizarElemento;
+window.eliminarElementoSeleccionado = eliminarElementoSeleccionado;
+window.mostrarToast = mostrarToast;
+
 // ============================================================
 // LIMPIEZA DE TEXTO PARA jsPDF
 // ============================================================
@@ -3379,47 +3421,6 @@ function exportarPDF() {
         alert('❌ Error al exportar PDF:\n' + e.message);
     }
 }
-
-// ============================================================
-// EXPONER FUNCIONES GLOBALES (para onclick en el HTML)
-// ============================================================
-window.abrirManual = abrirManual;
-window.irAModuloDPS = irAModuloDPS;
-window.abrirRepartoTableros = abrirRepartoTableros;
-window.instalarPWA = instalarPWA;
-window.cerrarBanner = cerrarBanner;
-window.toggleTema = toggleTema;
-window.cambiarTab = cambiarTab;
-window.guardarProyecto = guardarProyecto;
-window.nuevoProyecto = nuevoProyecto;
-window.cambiarProyecto = cambiarProyecto;
-window.resetear = resetear;
-window.abrirModalJSON = abrirModalJSON;
-window.cerrarModalJSON = cerrarModalJSON;
-window.ejecutarAccionJSON = ejecutarAccionJSON;
-window.exportarJSON = exportarJSON;
-window.importarArchivoJSON = importarArchivoJSON;
-window.exportarExcel = exportarExcel;
-window.exportarPDF = exportarPDF;
-window.agregarAmbiente = agregarAmbiente;
-window.eliminarAmbiente = eliminarAmbiente;
-window.actualizarBocas = actualizarBocas;
-window.cambiarTableroAmbiente = cambiarTableroAmbiente;
-window.resetearBocasMinimas = resetearBocasMinimas;
-window.agregarTablero = agregarTablero;
-window.eliminarTablero = eliminarTablero;
-window.actualizarTablero = actualizarTablero;
-window.actualizarSeccionCircuito = actualizarSeccionCircuito;
-window.actualizarProteccionCircuito = actualizarProteccionCircuito;
-window.actualizarLongitudCircuito = actualizarLongitudCircuito;
-window.actualizarPotenciaMotor = actualizarPotenciaMotor;
-window.setHerramienta = setHerramienta;
-window.limpiarPlano = limpiarPlano;
-window.autoUbicarBocas = autoUbicarBocas;
-window.exportarPlanoPNG = exportarPlanoPNG;
-window.actualizarElemento = actualizarElemento;
-window.eliminarElementoSeleccionado = eliminarElementoSeleccionado;
-window.mostrarToast = mostrarToast;
 
 // ============================================================
 // INICIALIZACIÓN
