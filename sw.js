@@ -15,7 +15,6 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Cachear UNO POR UNO para que un fallo no rompa todo
       return Promise.all(
         ASSETS.map((url) =>
           cache.add(url).catch((err) => {
@@ -41,7 +40,6 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  // No cachear peticiones cross-origin ni chrome-extension
   if (!event.request.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
@@ -54,6 +52,11 @@ self.addEventListener('fetch', (event) => {
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
             return response;
           })
+          .catch(() => cached)
+      );
+    })
+  );
+});
           .catch(() => cached)
       );
     })
