@@ -4,13 +4,11 @@ Aplicación web para el diseño de instalaciones eléctricas en viviendas unifam
 
 🌐 Demo
 
-👉 [Abrir la app](https://tu-usuario.github.io/aea770app/index.html)
-
-	> Reemplazá `tu-usuario` y `aea770app` por tu usuario de GitHub y el nombre del repositorio.
+👉 [Abrir la app](https://hbartolisap.github.io/aea770app/index.html)
 
 ✨ Funcionalidades
 
-Suite principal (`index.html`)
+Suite principal (index.html)
 
 	- Cálculo automático del Grado de Electrificación (Sla)
 	- Cálculo de bocas mínimas (IUG, TUG, TUE) con validación normativa
@@ -27,8 +25,20 @@ Suite principal (`index.html`)
 	- Modo oscuro
 	- PWA instalable en celular
 	- Acceso directo a la herramienta de Reparto de Tableros (botón `🔀 Reparto`)
+Manual de Uso (`manual.html`)
 
-Módulo de DPS (`dps.html`)
+Manual completo con 12 secciones, índice navegable y exportación a PDF.
+
+	- Introducción a la Suite
+	- Primeros pasos (instalación PWA, interfaz)
+	- Guía paso a paso de cada sección (Pasos 1 a 5)
+	- Módulo de DPS
+	- Reparto de Tableros
+	- Multi-proyecto
+	- Preguntas frecuentes
+	- Glosario de términos
+
+Módulo de DPS (dps.html)
 
 Evaluación de la necesidad de instalar un Dispositivo de Protección contra Sobretensiones según AEA 90364-7-771.
 
@@ -70,7 +80,8 @@ aea770app/
 │ ├── base.css ← Variables, reset y componentes comunes
 │ ├── index.css ← Estilos de la suite principal
 │ ├── dps.css ← Estilos del módulo de DPS
-│ └── reparto.css ← Estilos del reparto de tableros
+│ ├── reparto.css ← Estilos del reparto de tableros
+│ └── manual.css
 │
 ├── js/
 │ ├── index.js ← Lógica de la suite principal

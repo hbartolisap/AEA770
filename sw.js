@@ -1,9 +1,10 @@
-const CACHE_NAME = 'aea770-v8.2';
+const CACHE_NAME = 'aea770-v8.3';
 const ASSETS = [
   './',
   './index.html',
   './dps.html',
   './reparto_tableros.html',
+  './manual.html',
   './manifest.json',
 
   // CSS separado
@@ -11,6 +12,7 @@ const ASSETS = [
   './css/index.css',
   './css/dps.css',
   './css/reparto.css',
+  './css/manual.css',
 
   // JS separado
   './js/index.js',
