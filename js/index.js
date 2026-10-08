@@ -2717,6 +2717,9 @@ function abrirRepartoTableros() {
         guardarProyectos(proyectos);
         proyectoActualId = id;
         document.getElementById('selectorProyecto').value = id;
+	// NUEVO: Guardar copia específica para Reparto (igual que se hace para DPS)
+        localStorage.setItem('proyectoAEA_para_Reparto', JSON.stringify(proyectos[id]));
+
         mostrarToast('💾 Proyecto guardado antes de abrir Reparto');
     } catch(e) {
         console.warn('No se pudo autoguardar antes de abrir Reparto:', e);

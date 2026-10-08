@@ -13,6 +13,22 @@ const MAX = { iug: 15, tug: 15, tue: 12 };
 const VA  = { iug: 440, tug: 2200, tue: 3300 };
 
 // ============================================================
+// CARGA AUTOMÁTICA DESDE LOCALSTORAGE (si viene del index)
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const data = localStorage.getItem('proyectoAEA_para_Reparto');
+    if (data) {
+        try {
+            const p = JSON.parse(data);
+            console.log('✅ Proyecto cargado automáticamente desde localStorage');
+            importarProyecto(p);
+        } catch (e) {
+            console.warn('⚠️ No se pudo leer el proyecto desde localStorage:', e);
+        }
+    }
+});
+
+// ============================================================
 // CARGA DEL JSON DE LA SUITE
 // ============================================================
 function cargarJSONSuite(input) {
