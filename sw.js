@@ -1,13 +1,28 @@
-const CACHE_NAME = 'aea770-v8';
+const CACHE_NAME = 'aea770-v8.2';
 const ASSETS = [
   './',
   './index.html',
   './dps.html',
   './reparto_tableros.html',
   './manifest.json',
+
+  // CSS separado
+  './css/base.css',
+  './css/index.css',
+  './css/dps.css',
+  './css/reparto.css',
+
+  // JS separado
+  './js/index.js',
+  './js/dps.js',
+  './js/reparto.js',
+
+  // Librerías
   './libs/jspdf.umd.min.js',
   './libs/jspdf.plugin.autotable.min.js',
   './libs/xlsx.full.min.js',
+
+  // Íconos
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
@@ -15,13 +30,9 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return Promise.all(
-        ASSETS.map((url) =>
-          cache.add(url).catch((err) => {
-            console.warn('⚠ No se pudo cachear:', url, err.message);
-          })
-        )
-      );
+      return cache.addAll(ASSETS).catch((err) => {
+        console.warn('Algunos assets no se pudieron cachear:', err);
+      });
     })
   );
   self.skipWaiting();
@@ -29,36 +40,24 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
+    caches.keys().then((keys) => {
+      return Promise.all(
         keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
-      )
-    )
+      );
+    })
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  if (!event.request.url.startsWith(self.location.origin)) return;
-
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      return (
-        cached ||
-        fetch(event.request)
-          .then((response) => {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-            return response;
-          })
-          .catch(() => cached)
-      );
-    })
-  );
-});
-          .catch(() => cached)
-      );
+      return cached || fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      }).catch(() => cached);
     })
   );
 });
