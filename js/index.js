@@ -2755,6 +2755,28 @@ function irAModuloDPS() {
 }
 
 // ============================================================
+// ABRIR MANUAL DE USO
+// ============================================================
+function abrirManual() {
+    // Guardar el proyecto actual antes de salir (opcional, por si el usuario
+    // quiere volver y retomar donde estaba)
+    try {
+        const id = proyectoActualId || 'proy_' + Date.now();
+        const proyectos = obtenerProyectos();
+        proyectos[id] = capturarProyecto();
+        guardarProyectos(proyectos);
+        proyectoActualId = id;
+        document.getElementById('selectorProyecto').value = id;
+        localStorage.setItem('aea770_ultimo_proyecto', id);
+    } catch (e) {
+        console.warn('No se pudo autoguardar antes de abrir el manual:', e);
+    }
+    // Abrir el manual en la misma pestaña
+    window.location.href = 'manual.html';
+}
+window.abrirManual = abrirManual;
+
+// ============================================================
 // TOAST
 // ============================================================
 function mostrarToast(mensaje) {
@@ -3357,6 +3379,47 @@ function exportarPDF() {
         alert('❌ Error al exportar PDF:\n' + e.message);
     }
 }
+
+// ============================================================
+// EXPONER FUNCIONES GLOBALES (para onclick en el HTML)
+// ============================================================
+window.abrirManual = abrirManual;
+window.irAModuloDPS = irAModuloDPS;
+window.abrirRepartoTableros = abrirRepartoTableros;
+window.instalarPWA = instalarPWA;
+window.cerrarBanner = cerrarBanner;
+window.toggleTema = toggleTema;
+window.cambiarTab = cambiarTab;
+window.guardarProyecto = guardarProyecto;
+window.nuevoProyecto = nuevoProyecto;
+window.cambiarProyecto = cambiarProyecto;
+window.resetear = resetear;
+window.abrirModalJSON = abrirModalJSON;
+window.cerrarModalJSON = cerrarModalJSON;
+window.ejecutarAccionJSON = ejecutarAccionJSON;
+window.exportarJSON = exportarJSON;
+window.importarArchivoJSON = importarArchivoJSON;
+window.exportarExcel = exportarExcel;
+window.exportarPDF = exportarPDF;
+window.agregarAmbiente = agregarAmbiente;
+window.eliminarAmbiente = eliminarAmbiente;
+window.actualizarBocas = actualizarBocas;
+window.cambiarTableroAmbiente = cambiarTableroAmbiente;
+window.resetearBocasMinimas = resetearBocasMinimas;
+window.agregarTablero = agregarTablero;
+window.eliminarTablero = eliminarTablero;
+window.actualizarTablero = actualizarTablero;
+window.actualizarSeccionCircuito = actualizarSeccionCircuito;
+window.actualizarProteccionCircuito = actualizarProteccionCircuito;
+window.actualizarLongitudCircuito = actualizarLongitudCircuito;
+window.actualizarPotenciaMotor = actualizarPotenciaMotor;
+window.setHerramienta = setHerramienta;
+window.limpiarPlano = limpiarPlano;
+window.autoUbicarBocas = autoUbicarBocas;
+window.exportarPlanoPNG = exportarPlanoPNG;
+window.actualizarElemento = actualizarElemento;
+window.eliminarElementoSeleccionado = eliminarElementoSeleccionado;
+window.mostrarToast = mostrarToast;
 
 // ============================================================
 // INICIALIZACIÓN
