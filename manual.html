@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Uso - AEA 770 Suite v8</title>
+
+<!-- CSS separado -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/manual.css">
+</head>
+<body>
+
+<!-- Header del manual -->
+<header class="manual-header">
+    <div class="manual-header-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <h1>📖 Manual de Uso — AEA 770 Suite v8</h1>
+    </div>
+    <div class="manual-header-right">
+        <button onclick="window.print()">🖨️ Imprimir / PDF</button>
+        <button onclick="window.location.href='index.html'">← Volver al Diseño</button>
+    </div>
+</header>
+
+<!-- Overlay para mobile -->
+<div class="manual-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- Layout principal -->
+<div class="manual-wrapper">
+
+    <!-- Sidebar con índice -->
+    <aside class="manual-sidebar" id="sidebar">
+        <div class="manual-sidebar-header">
+            <h1>📖 Índice</h1>
+            <p>AEA 770 Suite v8</p>
+        </div>
+        <ul class="manual-toc" id="toc">
+            <li><a class="toc-section">Introducción</a></li>
+            <li><a onclick="showSection('intro')" data-section="intro">1. ¿Qué es la Suite AEA 770?</a></li>
+            <li><a onclick="showSection('primeros-pasos')" data-section="primeros-pasos">2. Primeros pasos</a></li>
+
+            <li><a class="toc-section">Suite Principal</a></li>
+            <li><a onclick="showSection('paso1')" data-section="paso1">3. Paso 1: Datos generales</a></li>
+            <li><a onclick="showSection('paso2')" data-section="paso2">4. Paso 2: Ambientes</a></li>
+            <li><a onclick="showSection('paso3')" data-section="paso3">5. Paso 3: Tableros</a></li>
+            <li><a onclick="showSection('paso4')" data-section="paso4">6. Paso 4: Resultados</a></li>
+            <li><a onclick="showSection('paso5')" data-section="paso5">7. Paso 5: Exportar</a></li>
+
+            <li><a class="toc-section">Módulos complementarios</a></li>
+            <li><a onclick="showSection('dps')" data-section="dps">8. Módulo de DPS</a></li>
+            <li><a onclick="showSection('reparto')" data-section="reparto">9. Reparto de Tableros</a></li>
+
+            <li><a class="toc-section">Gestión</a></li>
+            <li><a onclick="showSection('multi-proyecto')" data-section="multi-proyecto">10. Multi-proyecto</a></li>
+
+            <li><a class="toc-section">Ayuda</a></li>
+            <li><a onclick="showSection('faq')" data-section="faq">11. Preguntas frecuentes</a></li>
+            <li><a onclick="showSection('glosario')" data-section="glosario">12. Glosario</a></li>
+        </ul>
+    </aside>
+
+    <!-- Contenido del manual -->
+    <main class="manual-content">
+        <div class="manual-page">
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 1: INTRODUCCIÓN -->
+            <!-- ============================================ -->
+            <section class="manual-section active" id="intro">
+                <h2>📘 1. ¿Qué es la Suite AEA 770?</h2>
+
+                <p>La <strong>Suite AEA 770 v8</strong> es una aplicación web que corre 100% en el navegador (sin servidor, sin instalación, sin internet) para el <strong>diseño de instalaciones eléctricas en viviendas unifamiliares</strong> según la normativa argentina <strong>AEA 90364-7-770</strong>.</p>
+
+                <h3>¿Qué podés hacer con la Suite?</h3>
+                <ul>
+                    <li>Calcular el <strong>grado de electrificación</strong> de la vivienda (Mínimo, Medio, Elevado, Superior).</li>
+                    <li>Calcular las <strong>bocas mínimas</strong> de IUG, TUG y TUE según la superficie y tipo de ambiente.</li>
+                    <li>Diseñar la <strong>acometida</strong> (medidor → tablero principal) con verificación de caída de tensión.</li>
+                    <li>Diseñar la <strong>puesta a tierra</strong> (PAT) con jabalinas.</li>
+                    <li>Crear <strong>tableros seccionales</strong> con jerarquía (Principal + seccionales).</li>
+                    <li>Calcular la <strong>corriente de cortocircuito (Icc)</strong> en cascada.</li>
+                    <li>Verificar <strong>caída de tensión</strong> por circuito y <strong>arranque de motores</strong>.</li>
+                    <li>Sugerir <strong>protecciones diferenciales</strong> (30 / 300 mA).</li>
+                    <li>Evaluar la necesidad de <strong>DPS</strong> (Dispositivo de Protección contra Sobretensiones).</li>
+                    <li>Distribuir <strong>ambientes entre tableros</strong> con la herramienta de Reparto.</li>
+                    <li>Generar el <strong>plano eléctrico</strong> con drag & drop.</li>
+                    <li>Exportar a <strong>Excel, PDF y JSON</strong>.</li>
+                </ul>
+
+                <h3>Módulos de la Suite</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Módulo</th>
+                            <th>Archivo</th>
+                            <th>Para qué sirve</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Suite Principal</strong></td>
+                            <td><code>index.html</code></td>
+                            <td>Diseño completo de la instalación</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Módulo de DPS</strong></td>
+                            <td><code>dps.html</code></td>
+                            <td>Evaluar protección contra sobretensiones (AEA 771)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reparto de Tableros</strong></td>
+                            <td><code>reparto_tableros.html</code></td>
+                            <td>Balancear ambientes entre tableros</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-info">
+                    <strong>💡 Importante</strong>
+                    La Suite es <strong>100% offline</strong>. Una vez instalada como PWA, funciona sin conexión a internet.
+                </div>
+
+                <div class="manual-nav-buttons">
+                    <button disabled>← Anterior</button>
+                    <button onclick="showSection('primeros-pasos')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 2: PRIMEROS PASOS -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="primeros-pasos">
+                <h2>🚀 2. Primeros pasos</h2>
+
+                <h3>2.1. Abrir la Suite</h3>
+                <p>Hay dos formas de usarla:</p>
+                <ul>
+                    <li><strong>Online:</strong> Ingresá a la URL del proyecto (ej: <code>https://tu-usuario.github.io/aea770app/</code>).</li>
+                    <li><strong>Instalada:</strong> Si ya la instalaste como PWA en el celular o PC, abrila desde el ícono.</li>
+                </ul>
+
+                <h3>2.2. Instalar como PWA (recomendado)</h3>
+                <p>La Suite se puede instalar como aplicación nativa en cualquier dispositivo moderno:</p>
+
+                <h4>En PC (Chrome / Edge):</h4>
+                <ol>
+                    <li>Abrí la Suite en el navegador.</li>
+                    <li>En la barra de direcciones, a la derecha, buscá el ícono de <strong>instalar</strong> (⊕ o un monitor con flecha).</li>
+                    <li>Hacé clic en "Instalar".</li>
+                    <li>La app aparece como un programa más en tu sistema.</li>
+                </ol>
+
+                <h4>En Android (Chrome):</h4>
+                <ol>
+                    <li>Abrí la Suite en Chrome.</li>
+                    <li>Tocá el menú ⋮ (arriba a la derecha).</li>
+                    <li>Elegí <strong>"Instalar aplicación"</strong> o <strong>"Agregar a pantalla de inicio"</strong>.</li>
+                    <li>Confirmá. La app queda como un ícono más.</li>
+                </ol>
+
+                <h4>En iPhone / iPad (Safari):</h4>
+                <ol>
+                    <li>Abrí la Suite en Safari.</li>
+                    <li>Tocá el botón <strong>Compartir</strong> (cuadrado con flecha hacia arriba).</li>
+                    <li>Elegí <strong>"Agregar a inicio"</strong>.</li>
+                    <li>Confirmá. La app queda como un ícono más.</li>
+                </ol>
+
+                <h3>2.3. Interfaz general</h3>
+                <p>Todas las páginas de la Suite comparten la misma estructura:</p>
+                <ul>
+                    <li><strong>Header:</strong> barra superior oscura con el título y los botones de acción.</li>
+                    <li><strong>Pasos 1 a 5:</strong> secciones numeradas que guían el diseño.</li>
+                    <li><strong>Modo oscuro:</strong> botón 🌙 en el header para cambiar entre tema claro y oscuro.</li>
+                </ul>
+
+                <h3>2.4. Flujo de trabajo recomendado</h3>
+                <ol>
+                    <li><strong>Paso 1:</strong> Cargá los datos generales (superficies, marca, tipo de cable, acometida, PAT).</li>
+                    <li><strong>Paso 3:</strong> Creá los tableros (si vas a usar seccionales).</li>
+                    <li><strong>Paso 2:</strong> Agregá los ambientes y asignálos a tableros.</li>
+                    <li><strong>Paso 4:</strong> Revisá los resultados en cada pestaña.</li>
+                    <li><strong>Paso 5:</strong> Exportá a Excel o PDF.</li>
+                </ol>
+
+                <div class="callout callout-warn">
+                    <strong>⚠️ Atajo de teclado</strong>
+                    Para ver la consola de errores, presioná <strong>F12</strong>. Es útil si algo no funciona como esperás.
+                </div>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('intro')">← Anterior</button>
+                    <button onclick="showSection('paso1')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 3: PASO 1 -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="paso1">
+                <h2>📝 3. Paso 1: Datos generales</h2>
+
+                <p>En este paso cargás los datos básicos de la vivienda, el tipo de instalación y la puesta a tierra.</p>
+
+                <h3>3.1. Datos de la vivienda</h3>
+                <table>
+                    <thead>
+                        <tr><th>Campo</th><th>Qué es</th><th>Ejemplo</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Nombre del Proyecto</strong></td><td>Identifica al proyecto en la lista</td><td>"Casa Rodríguez"</td></tr>
+                        <tr><td><strong>Superficie Cubierta</strong></td><td>m² cubiertos</td><td>94</td></tr>
+                        <tr><td><strong>Superficie Semicubierta</strong></td><td>m² semicubiertos (se cuenta al 50%)</td><td>4</td></tr>
+                        <tr><td><strong>Sla</strong></td><td>Superficie límite de aplicación (calculada automáticamente)</td><td>96 m²</td></tr>
+                        <tr><td><strong>Grado</strong></td><td>Grado de electrificación (calculado automáticamente)</td><td>MEDIO</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-info">
+                    <strong>💡 Fórmula de Sla</strong>
+                    Sla = Superficie Cubierta + (Superficie Semicubierta × 0.5)
+                </div>
+
+                <h3>3.2. Grado de electrificación</h3>
+                <table>
+                    <thead>
+                        <tr><th>Grado</th><th>Sla (m²)</th><th>Coef. Simultaneidad</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>MÍNIMO</strong></td><td>≤ 60</td><td>1.0</td></tr>
+                        <tr><td><strong>MEDIO</strong></td><td>61 – 130</td><td>0.9</td></tr>
+                        <tr><td><strong>ELEVADO</strong></td><td>131 – 200</td><td>0.8</td></tr>
+                        <tr><td><strong>SUPERIOR</strong></td><td>&gt; 200</td><td>0.7</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>3.3. Marca de interruptores y tipo de cable</h3>
+                <ul>
+                    <li><strong>Marca de Interruptores:</strong> Schneider, Siemens, ABB o Legrand. Determina los modelos de protecciones sugeridos.</li>
+                    <li><strong>Tipo de Cable (circuitos):</strong> Unipolar IRAM NM 247-3, Afumex o Sintenax. Determina la ampacidad y caída de tensión.</li>
+                </ul>
+
+                <h3>3.4. Acometida (medidor → tablero principal)</h3>
+                <table>
+                    <thead>
+                        <tr><th>Campo</th><th>Qué es</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Longitud real</strong></td><td>Distancia en metros entre el medidor y el tablero principal</td></tr>
+                        <tr><td><strong>Tipo de Cable</strong></td><td>Unipolar, Afumex o Sintenax</td></tr>
+                        <tr><td><strong>Sección por fase</strong></td><td>4, 6, 10, 16, 25 o 35 mm²</td></tr>
+                        <tr><td><strong>Cantidad de conductores</strong></td><td>3 (monofásico), 4 (trifásico), 5 (trifásico + PE)</td></tr>
+                        <tr><td><strong>Tipo de instalación</strong></td><td>Enterrado, Embutido, A la vista o Aéreo</td></tr>
+                        <tr><td><strong>Protección mecánica</strong></td><td>Tubo PVC, caño metálico, cablecanal o sin protección</td></tr>
+                    </tbody>
+                </table>
+
+                <p>La app calcula automáticamente:</p>
+                <ul>
+                    <li><strong>Corriente de diseño (A)</strong></li>
+                    <li><strong>Caída de tensión (%)</strong> — debe ser ≤ 5%</li>
+                    <li><strong>Icc en Tablero Principal (kA)</strong></li>
+                </ul>
+
+                <h3>3.5. Puesta a Tierra (PAT)</h3>
+                <table>
+                    <thead>
+                        <tr><th>Campo</th><th>Qué es</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Cantidad de jabalinas</strong></td><td>1 a 10. Más jabalinas = menor resistencia total</td></tr>
+                        <tr><td><strong>Longitud cable PAT</strong></td><td>Metros de cable desde jabalinas al tablero</td></tr>
+                        <tr><td><strong>Sección cable PAT</strong></td><td>4, 6, 10, 16 o 25 mm²</td></tr>
+                        <tr><td><strong>Tipo de jabalina</strong></td><td>Copperweld 5/8" × 1.5 m (IRAM 2309), Copperweld 3 m, o acero-cobre 3/4" × 2 m</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="callout callout-warn">
+                    <strong>⚠️ Verificación en obra</strong>
+                    La app NO calcula la resistividad del terreno. Verificá en obra que <strong>R ≤ 40 Ω</strong> con un telurómetro (AEA 770 Sección 770.8).
+                </div>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('primeros-pasos')">← Anterior</button>
+                    <button onclick="showSection('paso2')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 4: PASO 2 -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="paso2">
+                <h2>🏠 4. Paso 2: Ambientes</h2>
+
+                <p>En este paso cargás los ambientes de la vivienda (habitaciones, cocina, baños, etc.) y el sistema calcula las <strong>bocas mínimas</strong> de cada uno.</p>
+
+                <h3>4.1. Agregar un ambiente</h3>
+                <ol>
+                    <li>Completá el <strong>nombre</strong> del ambiente (ej: "Dormitorio 1").</li>
+                    <li>Elegí el <strong>tipo</strong> (Habitación, Dormitorio, Cocina, Baño, etc.).</li>
+                    <li>Ingresá la <strong>superficie</strong> en m².</li>
+                    <li>Elegí el <strong>tablero</strong> al que pertenece (si tenés varios).</li>
+                    <li>Hacé clic en <strong>➕ Agregar</strong>.</li>
+                </ol>
+
+                <h3>4.2. Tipos de ambiente</h3>
+                <table>
+                    <thead>
+                        <tr><th>Tipo</th><th>Uso típico</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Habitación</td><td>Sala, estar, comedor</td></tr>
+                        <tr><td>Dormitorio</td><td>Dormitorios (con o sin AA)</td></tr>
+                        <tr><td>Cocina</td><td>Cocina principal</td></tr>
+                        <tr><td>Baño</td><td>Baño o toilette (Sección 701)</td></tr>
+                        <tr><td>Pasillo</td><td>Pasillos y distribuidores</td></tr>
+                        <tr><td>Vestíbulo</td><td>Hall, garage, entrada</td></tr>
+                        <tr><td>Lavadero</td><td>Lavadero con lavarropas</td></tr>
+                        <tr><td>Balcón</td><td>Balcón o galería exterior</td></tr>
+                        <tr><td>Kitchenette</td><td>Cocina integrada</td></tr>
+                        <tr><td>Depósito</td><td>Depósito o guardado</td></tr>
+                        <tr><td>Cuarto Técnico</td><td>Cuarto de máquinas o bombas</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>4.3. Bocas mínimas por tipo</h3>
+                <p>La app calcula las bocas mínimas según la normativa:</p>
+                <table>
+                    <thead>
+                        <tr><th>Tipo</th><th>IUG</th><th>TUG</th><th>TUE</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Habitación</td><td>máx(1, área/18)</td><td>máx(2, área/6)</td><td>—</td></tr>
+                        <tr><td>Dormitorio</td><td>1</td><td>2 o 3</td><td>Solo si área &gt; 36 m²</td></tr>
+                        <tr><td>Cocina</td><td>2</td><td>3</td><td>—</td></tr>
+                        <tr><td>Baño</td><td>1</td><td>1</td><td>—</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>4.4. Bocas editables</h3>
+                <p>Podés <strong>aumentar</strong> las bocas por encima del mínimo. El sistema no te deja bajarlas del mínimo normativo.</p>
+                <p>El botón <strong>🔄 Volver todos a mínimos</strong> resetea todas las bocas a los valores normativos.</p>
+
+                <h3>4.5. Asignar ambientes a tableros</h3>
+                <p>Cada ambiente tiene un selector de <strong>Tablero</strong>. Si solo tenés el Principal, creá primero un tablero seccional en el Paso 3.</p>
+
+                <div class="callout callout-info">
+                    <strong>💡 Alturas recomendadas</strong>
+                    La tabla muestra las alturas NPT (Nivel de Piso Terminado) recomendadas para cada tipo de boca. Se aplican al plano y a los planos de instalación.
+                </div>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('paso1')">← Anterior</button>
+                    <button onclick="showSection('paso3')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 5: PASO 3 -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="paso3">
+                <h2>⚡ 5. Paso 3: Tableros</h2>
+
+                <p>En este paso creás los <strong>tableros seccionales</strong> (además del Principal) y definís su jerarquía.</p>
+
+                <h3>5.1. Crear un tablero</h3>
+                <ol>
+                    <li>Ingresá el <strong>nombre</strong> del tablero (ej: "Tablero Planta Alta").</li>
+                    <li>Elegí la <strong>planta</strong> (PB, PA, Subsuelo, Exterior, Otra).</li>
+                    <li>Elegí el <strong>tablero padre</strong> (de dónde se alimenta).</li>
+                    <li>Hacé clic en <strong>➕ Agregar Tablero</strong>.</li>
+                </ol>
+
+                <h3>5.2. Jerarquía de tableros</h3>
+                <p>Los tableros tienen una jerarquía tipo árbol:</p>
+                <ul>
+                    <li><strong>Principal:</strong> Se alimenta directo de la acometida de la distribuidora.</li>
+                    <li><strong>Seccional:</strong> Se alimenta desde otro tablero (normalmente el Principal).</li>
+                    <li><strong>Sub-seccional:</strong> Se alimenta desde un seccional.</li>
+                </ul>
+
+                <h3>5.3. Datos de cada tablero</h3>
+                <table>
+                    <thead>
+                        <tr><th>Campo</th><th>Qué es</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Nombre</strong></td><td>Identifica al tablero</td></tr>
+                        <tr><td><strong>Planta</strong></td><td>Ubicación física</td></tr>
+                        <tr><td><strong>Se alimenta desde</strong></td><td>Otro tablero o la acometida</td></tr>
+                        <tr><td><strong>Longitud desde padre</strong></td><td>Metros de cable desde el tablero padre</td></tr>
+                        <tr><td><strong>Sección de línea</strong></td><td>Sección del cable que lo alimenta</td></tr>
+                        <tr><td><strong>Icc Aguas Arriba</strong></td><td>Calculado automáticamente</td></tr>
+                        <tr><td><strong>PdC Requerido</strong></td><td>Poder de corte comercial requerido (3, 4.5, 6 o 10 kA)</td></tr>
+                        <tr><td><strong>Circuitos</strong></td><td>Cantidad de circuitos asignados</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>5.4. Distribución de circuitos</h3>
+                <p>La app distribuye automáticamente los circuitos entre los tableros según los ambientes asignados. La regla es:</p>
+                <ul>
+                    <li><strong>IUG:</strong> máximo 15 bocas por circuito</li>
+                    <li><strong>TUG:</strong> máximo 15 bocas por circuito</li>
+                    <li><strong>TUE:</strong> máximo 12 bocas por circuito</li>
+                </ul>
+
+                <div class="callout callout-warn">
+                    <strong>⚠️ Antes de crear tableros</strong>
+                    Si vas a usar tableros seccionales, creálos <strong>antes</strong> de agregar los ambientes, así podés asignar los ambientes directamente a cada tablero.
+                </div>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('paso2')">← Anterior</button>
+                    <button onclick="showSection('paso4')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 6: PASO 4 -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="paso4">
+                <h2>📊 6. Paso 4: Resultados</h2>
+
+                <p>En este paso ves todos los cálculos y verificaciones. Hay <strong>12 pestañas</strong>:</p>
+
+                <h3>6.1. Pestaña "Acometida"</h3>
+                <p>Muestra el detalle completo de la acometida (medidor → tablero principal):</p>
+                <ul>
+                    <li>Longitud, tipo de cable, sección</li>
+                    <li>Corriente de diseño</li>
+                    <li>Caída de tensión (debe ser ≤ 5%)</li>
+                    <li>Icc en el tablero principal</li>
+                    <li>PdC requerido</li>
+                </ul>
+
+                <h3>6.2. Pestaña "DPMS"</h3>
+                <p>Muestra el <strong>DPMS (Demanda de Potencia Máxima Simultánea)</strong>:</p>
+                <ul>
+                    <li>Bocas IUG, TUG, TUE</li>
+                    <li>Circuitos IUG, TUG, TUE</li>
+                    <li>DPMS total (VA)</li>
+                    <li>DPMS con coeficiente de simultaneidad según el grado</li>
+                </ul>
+
+                <h3>6.3. Pestaña "Cortocircuito"</h3>
+                <p>Muestra la <strong>Icc (corriente de cortocircuito)</strong> en cada punto:</p>
+                <ul>
+                    <li>Acometida (medidor → principal)</li>
+                    <li>Cada tablero seccional</li>
+                    <li>PdC comercial requerido en cada punto</li>
+                </ul>
+
+                <h3>6.4. Pestaña "Circuitos"</h3>
+                <p>Listado completo de circuitos con columnas editables:</p>
+                <ul>
+                    <li><strong>Sección (mm²)</strong>: editable con selector</li>
+                    <li><strong>Protección (A)</strong>: editable con selector</li>
+                    <li><strong>Longitud (m)</strong>: editable con input</li>
+                    <li><strong>Potencia (W)</strong>: solo para TUE (motores)</li>
+                </ul>
+                <p>La app calcula automáticamente:</p>
+                <ul>
+                    <li>Caída de tensión (%) por circuito</li>
+                    <li>Icc aguas abajo del circuito</li>
+                    <li>PdC comercial requerido</li>
+                    <li>Verificación (✔ o ✖)</li>
+                </ul>
+
+                <h3>6.5. Pestaña "Motores"</h3>
+                <p>Muestra el arranque de motores (solo circuitos TUE):</p>
+                <ul>
+                    <li>Corriente nominal</li>
+                    <li>Corriente de arranque (×6 para arranque directo)</li>
+                    <li>Caída de tensión en régimen (≤ 5%)</li>
+                    <li>Caída de tensión en arranque (≤ 15%)</li>
+                </ul>
+
+                <h3>6.6. Pestaña "Diferenciales"</h3>
+                <p>Sugerencia de protecciones diferenciales:</p>
+                <ul>
+                    <li>Cabecera principal: ID 300 mA Selectivo</li>
+                    <li>TUG: ID 30 mA</li>
+                    <li>TUE: ID 30 mA</li>
+                    <li>Baño: ID 30 mA exclusivo (Sección 701)</li>
+                    <li>Tableros seccionales: ID 30 mA o 300 mA</li>
+                </ul>
+
+                <h3>6.7. Pestaña "DPS"</h3>
+                <p>Muestra el resultado del módulo de DPS (si fue evaluado):</p>
+                <ul>
+                    <li>Obligatoriedad</li>
+                    <li>Tipo recomendado (Tipo 1, 2 o 3)</li>
+                    <li>Up recomendado</li>
+                    <li>Dispositivos del catálogo</li>
+                </ul>
+
+                <h3>6.8. Pestaña "Alturas"</h3>
+                <p>Alturas recomendadas para cada boca:</p>
+                <ul>
+                    <li>IUG: 1.10 m</li>
+                    <li>TUG: 0.30 m o 1.10 m según ambiente</li>
+                    <li>TUE: 1.10 m o 2.00 m según ambiente</li>
+                    <li>TV/Datos: 0.30 m o 1.10 m según ambiente</li>
+                    <li>Tableros: 1.30 – 1.80 m (centro del gabinete)</li>
+                </ul>
+
+                <h3>6.9. Pestaña "Materiales"</h3>
+                <p>Lista completa de materiales:</p>
+                <ul>
+                    <li>Acometida (cable, protección mecánica, gabinete)</li>
+                    <li>PAT (jabalinas, cable, cámara de inspección)</li>
+                    <li>Tableros (gabinetes)</li>
+                    <li>Protecciones (PIA, diferenciales, DPS)</li>
+                    <li>Cables por sección</li>
+                    <li>Canalizaciones</li>
+                    <li>Cajas y bocas</li>
+                </ul>
+
+                <h3>6.10. Pestaña "Plano"</h3>
+                <p>Editor interactivo del plano eléctrico:</p>
+                <ul>
+                    <li><strong>Herramientas:</strong> Boca IUG, TUG, TUE, TV/Datos, Tablero, Borrar</li>
+                    <li><strong>Drag & drop:</strong> movés las bocas con el mouse</li>
+                    <li><strong>Auto-ubicar:</strong> ubica todas las bocas automáticamente</li>
+                    <li><strong>Exportar PNG:</strong> descarga el plano como imagen</li>
+                </ul>
+
+                <h3>6.11. Pestaña "Esquema"</h3>
+                <p>Esquema unifilar completo de la instalación:</p>
+                <ul>
+                    <li>Medidor</li>
+                    <li>Tableros en cascada</li>
+                    <li>Circuitos con protección y sección</li>
+                    <li>DPS (si fue evaluado)</li>
+                    <li>PAT (puesta a tierra)</li>
+                </ul>
+
+                <h3>6.12. Pestaña "Verificaciones"</h3>
+                <p>Lista de verificaciones normativas:</p>
+                <ul>
+                    <li>DPMS dentro del grado</li>
+                    <li>Caída de tensión OK</li>
+                    <li>Arranque de motores OK</li>
+                    <li>Ampacidad OK</li>
+                    <li>Conductores permitidos según AEA 770</li>
+                    <li>PAT verificada</li>
+                    <li>Baños OK (Sección 701)</li>
+                    <li>DPS evaluado</li>
+                </ul>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('paso3')">← Anterior</button>
+                    <button onclick="showSection('paso5')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 7: PASO 5 -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="paso5">
+                <h2>📤 7. Paso 5: Exportar</h2>
+
+                <p>Al final del diseño podés exportar todo a distintos formatos:</p>
+
+                <h3>7.1. Exportar a Excel</h3>
+                <p>Genera un archivo <code>.xlsx</code> con múltiples hojas:</p>
+                <ul>
+                    <li>Datos Generales</li>
+                    <li>Acometida</li>
+                    <li>Conductores AEA</li>
+                    <li>Ambientes</li>
+                    <li>Circuitos</li>
+                    <li>Motores</li>
+                    <li>Tableros</li>
+                    <li>Alturas</li>
+                    <li>Cables</li>
+                    <li>Materiales</li>
+                    <li>Plano</li>
+                    <li>Verificaciones</li>
+                </ul>
+
+                <h3>7.2. Exportar a PDF</h3>
+                <p>Genera un PDF profesional con:</- Portada con datos del proyecto</p>
+                <ul>
+                    <li>Datos generales</li>
+                    <li>Acometida</li>
+                    <li>PAT</li>
+                    <li>Conductores AEA 770</li>
+                    <li>Ambientes y alturas</li>
+                    <li>Tableros</li>
+                    <li>Circuitos</li>
+                    <li>Motores</li>
+                    <li>Alturas de referencia</li>
+                    <li>Materiales</li>
+                    <li>Plano eléctrico</li>
+                </ul>
+
+                <h3>7.3. Exportar a JSON</h3>
+                <p>Guarda el proyecto completo en un archivo <code>.json</code> que se puede:</p>
+                <ul>
+                    <li>Compartir con otros usuarios</li>
+                    <li>Respaldar</li>
+                    <li>Importar en otra PC</li>
+                </ul>
+
+                <h3>7.4. Reparto de Tableros</h3>
+                <p>Abre la herramienta de Reparto en una pestaña nueva (ver Sección 9).</p>
+
+                <h3>7.5. Guardar</h3>
+                <p>Guarda el proyecto en el <strong>localStorage</strong> del navegador. Aparece en el selector de proyectos del header.</p>
+
+                <h3>7.6. Reiniciar</h3>
+                <p>Borra todo y empieza de cero. <strong>Pedí confirmación antes de hacerlo.</strong></p>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('paso4')">← Anterior</button>
+                    <button onclick="showSection('dps')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 8: DPS -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="dps">
+                <h2>⚡ 8. Módulo de DPS</h2>
+
+                <p>El módulo de DPS evalúa la necesidad de instalar un <strong>Dispositivo de Protección contra Sobretensiones</strong> según AEA 90364-7-771.</p>
+
+                <h3>8.1. Cómo acceder</h3>
+                <ol>
+                    <li>Cargá un proyecto en la Suite principal.</li>
+                    <li>Hacé clic en el botón <strong>⚡ DPS</strong> en el header.</li>
+                    <li>La app guarda el proyecto automáticamente y navega al módulo.</li>
+                </ol>
+
+                <h3>8.2. Datos de entrada</h3>
+                <table>
+                    <thead>
+                        <tr><th>Campo</th><th>Qué es</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Tipo de Acometida</strong></td><td>Aérea o Subterránea</td></tr>
+                        <tr><td><strong>Tiene Pararrayos</strong></td><td>Sí o No</td></tr>
+                        <tr><td><strong>Nivel de Riesgo</strong></td><td>Bajo, Medio, Alto o Muy Alto (según DDT de la zona)</td></tr>
+                        <tr><td><strong>Marca del DPS</strong></td><td>Schneider, ABB, Siemens o Legrand</td></tr>
+                        <tr><td><strong>Icc Origen</strong></td><td>Tomado del proyecto (solo lectura)</td></tr>
+                        <tr><td><strong>Configuración</strong></td><td>Trifásico o Monofásico (calculado)</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>8.3. Reglas de obligatoriedad</h3>
+                <p>El DPS es <strong>obligatorio</strong> si:</p>
+                <ul>
+                    <li>La acometida es <strong>aérea</strong></li>
+                    <li>El inmueble tiene <strong>pararrayos</strong></li>
+                    <li>El nivel de riesgo es <strong>muy alto</strong> (DDT &gt; 8)</li>
+                </ul>
+
+                <h3>8.4. Tipos de DPS</h3>
+                <table>
+                    <thead>
+                        <tr><th>Tipo</th><th>Uso</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Tipo 1 (Clase B)</strong></td><td>Protección contra impactos directos (pararrayos)</td></tr>
+                        <tr><td><strong>Tipo 2 (Clase C)</strong></td><td>Protección contra sobretensiones inducidas</td></tr>
+                        <tr><td><strong>Tipo 3 (Clase D)</strong></td><td>Protección fina de equipos electrónicos</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>8.5. Guardar el resultado</h3>
+                <p>Después de evaluar:</p>
+                <ol>
+                    <li>Hacé clic en <strong>💾 Guardar Resultado</strong>.</li>
+                    <li>El resultado se guarda en el localStorage del proyecto.</li>
+                    <li>Volvé a la Suite principal con <strong>← Volver al Diseño</strong>.</li>
+                </ol>
+
+                <p>El resultado aparece en:</p>
+                <ul>
+                    <li>Pestaña <strong>⚡ DPS</strong> del Paso 4</li>
+                    <li>Pestaña <strong>📦 Materiales</strong> del Paso 4 (agrega el DPS recomendado)</li>
+                    <li>Esquema unifilar del Paso 4</li>
+                </ul>
+
+                <h3>8.6. Exportar a PDF</h3>
+                <p>El botón <strong>📄 Exportar Informe a PDF</strong> genera un informe profesional con toda la evaluación del DPS.</p>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('paso5')">← Anterior</button>
+                    <button onclick="showSection('reparto')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 9: REPARTO -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="reparto">
+                <h2>🔀 9. Reparto de Tableros</h2>
+
+                <p>La herramienta de Reparto permite <strong>balancear los ambientes entre los distintos tableros</strong> y visualizar la distribución final de circuitos.</p>
+
+                <h3>9.1. Cómo acceder</h3>
+                <ol>
+                    <li>En la Suite principal, hacé clic en el botón <strong>🔀 Reparto</strong> del header.</li>
+                    <li>La app guarda el proyecto automáticamente en el localStorage.</li>
+                    <li>Se abre una nueva pestaña con la herramienta.</li>
+                    <li>El proyecto se carga <strong>automáticamente</strong>.</li>
+                </ol>
+
+                <h3>9.2. Secciones de la herramienta</h3>
+
+                <h4>Sección 0: Cargar proyecto</h4>
+                <ul>
+                    <li>📁 <strong>Cargar JSON:</strong> si tenés el proyecto exportado como JSON.</li>
+                    <li>📄 <strong>Cargar ejemplo:</strong> para probar la herramienta.</li>
+                    <li>🗑️ <strong>Limpiar:</strong> borra todo.</li>
+                    <li>🌙 <strong>Modo oscuro:</strong> cambia el tema.</li>
+                </ul>
+
+                <h4>Sección 1: Ambientes por tablero</h4>
+                <ul>
+                    <li>Lista de todos los ambientes con su tablero asignado.</li>
+                    <li>Podés cambiar el tablero de cada ambiente con el selector.</li>
+                    <li>➕ <strong>Agregar ambiente manual:</strong> agregar un ambiente nuevo.</li>
+                    <li>✨ <strong>Distribución automática:</strong> balancea los ambientes entre tableros.</li>
+                </ul>
+
+                <h4>Sección 2: Resumen por tablero</h4>
+                <ul>
+                    <li>Bocas IUG, TUG, TUE por tablero.</li>
+                    <li>Circuitos por tipo.</li>
+                    <li>DPMS por tablero.</li>
+                </ul>
+
+                <h4>Sección 3: Lista de circuitos por tablero</h4>
+                <ul>
+                    <li>Lista de circuitos con número (C1, C2, ...).</li>
+                    <li>Tipo (IUG/TUG/TUE).</li>
+                    <li>Bocas por circuito.</li>
+                    <li>DPMS del circuito.</li>
+                    <li><strong>Zona / Área</strong> que cubre cada circuito.</li>
+                </ul>
+
+                <h4>Sección 4: Resumen global</h4>
+                <ul>
+                    <li>Totales de bocas y circuitos.</li>
+                    <li>DPMS total del inmueble.</li>
+                    <li>DPMS con coeficientes de simultaneidad (0.9, 0.8, 0.7).</li>
+                </ul>
+
+                <h4>Sección 5: Exportar</h4>
+                <ul>
+                    <li>📥 <strong>Excel:</strong> exporta el reparto completo.</li>
+                    <li>📄 <strong>PDF:</strong> genera un informe PDF.</li>
+                </ul>
+
+                <h3>9.3. Reglas aplicadas</h3>
+                <ul>
+                    <li><strong>IUG:</strong> máx. 15 bocas/circuito · 440 VA</li>
+                    <li><strong>TUG:</strong> máx. 15 bocas/circuito · 2200 VA</li>
+                    <li><strong>TUE:</strong> máx. 12 bocas/circuito · 3300 VA</li>
+                </ul>
+
+                <div class="callout callout-info">
+                    <strong>💡 Persistencia automática</strong>
+                    Si abrís el Reparto desde el botón <strong>🔀 Reparto</strong> de la Suite principal, el proyecto se carga automáticamente. No hace falta subir el JSON.
+                </div>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('dps')">← Anterior</button>
+                    <button onclick="showSection('multi-proyecto')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 10: MULTI-PROYECTO -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="multi-proyecto">
+                <h2>📂 10. Multi-proyecto</h2>
+
+                <p>La Suite permite manejar <strong>varios proyectos</strong> en simultáneo, todos guardados en el navegador.</p>
+
+                <h3>10.1. Guardar un proyecto</h3>
+                <p>Hacé clic en <strong>💾 Guardar</strong> en el header. El proyecto se guarda con un ID único y aparece en el selector.</p>
+
+                <h3>10.2. Cargar un proyecto</h3>
+                <p>Usá el <strong>selector de proyectos</strong> en el header (arriba a la izquierda). Elegí el proyecto que querés cargar y confirmá.</p>
+
+                <h3>10.3. Nuevo proyecto</h3>
+                <p>Hacé clic en <strong>➕ Nuevo</strong>. Pide confirmación y resetea todo.</p>
+
+                <h3>10.4. Exportar proyecto a JSON</h3>
+                <p>Hacé clic en <strong>📤 JSON</strong> en el header. Se abre un modal con el JSON completo. Podés copiarlo con el botón <strong>Copiar</strong>.</p>
+
+                <h3>10.5. Importar proyecto desde JSON</h3>
+                <p>Hay dos formas:</p>
+                <ul>
+                    <li><strong>📁 Importar:</strong> subís el archivo <code>.json</code> desde tu PC.</li>
+                    <li><strong>📥 Pegar:</strong> pegás el JSON en el modal.</li>
+                </ul>
+
+                <h3>10.6. Persistencia automática</h3>
+                <p>Cuando navegás entre módulos (por ejemplo, al DPS o al Reparto), la Suite guarda automáticamente el proyecto antes de salir. Al volver, se carga el mismo proyecto.</p>
+
+                <h3>10.7. ¿Dónde se guardan los proyectos?</h3>
+                <p>En el <strong>localStorage</strong> del navegador. Significa que:</p>
+                <ul>
+                    <li>Los proyectos son <strong>locales</strong> de tu navegador.</li>
+                    <li>No se sincronizan entre dispositivos.</li>
+                    <li>Si borrás el caché del navegador, se pierden.</li>
+                </ul>
+
+                <div class="callout callout-warn">
+                    <strong>⚠️ Backup recomendado</strong>
+                    Exportá tus proyectos a JSON periódicamente para tener respaldo. Si limpiás el caché, los perdés.
+                </div>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('reparto')">← Anterior</button>
+                    <button onclick="showSection('faq')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 11: FAQ -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="faq">
+                <h2>❓ 11. Preguntas frecuentes</h2>
+
+                <h3>❌ Error: "Cannot register ServiceWorker for scope..."</h3>
+                <p><strong>Causa:</strong> Estás abriendo la Suite con <code>file://</code> en vez de <code>http://</code> o <code>https://</code>.</p>
+                <p><strong>Solución:</strong> Serví la app desde un servidor local (Live Server, Python http.server) o subila a GitHub Pages.</p>
+
+                <h3>❌ Error: "Access to manifest.json blocked by CORS"</h3>
+                <p><strong>Causa:</strong> Lo mismo que el anterior. El manifest solo funciona con <code>http://</code>.</p>
+                <p><strong>Solución:</strong> Serví la app desde un servidor local o hosting.</p>
+
+                <h3>❌ La app no carga los estilos</h3>
+                <p><strong>Causa:</strong> El archivo CSS no se encontró o la ruta está mal.</p>
+                <p><strong>Solución:</strong> Verificá en F12 → Network que los CSS carguen con estado 200. Si da 404, la ruta `<link href="...">` está mal.</p>
+
+                <h3>❌ Error: "X is not defined"</h3>
+                <p><strong>Causa:</strong> Falta exponer la función al <code>window</code>.</p>
+                <p><strong>Solución:</strong> Agregá <code>window.X = X;</code> al final del archivo JS correspondiente.</p>
+
+                <h3>❌ No funciona offline</h3>
+                <p><strong>Causa:</strong> El Service Worker no se registró o no cacheó los archivos.</p>
+                <p><strong>Solución:</strong> Abrí F12 → Application → Service Workers. Si no aparece, verificá que <code>sw.js</code> esté bien enlazado y que estés sirviendo desde <code>http://</code>.</p>
+
+                <h3>❌ Los cambios no se ven (caché viejo)</h3>
+                <p><strong>Causa:</strong> El Service Worker está sirviendo la versión vieja.</p>
+                <p><strong>Solución:</strong> Cambiá el <code>CACHE_NAME</code> en <code>sw.js</code> (ej: de <code>aea770-v8.2</code> a <code>aea770-v8.3</code>) y recargá con Ctrl + Shift + R.</p>
+
+                <h3>❌ No puedo asignar ambientes a otro tablero</h3>
+                <p><strong>Causa:</strong> Solo hay un tablero (el Principal).</p>
+                <p><strong>Solución:</strong> Creá primero un tablero seccional en el Paso 3.</p>
+
+                <h3>❌ El resultado del DPS no aparece en la Suite</h3>
+                <p><strong>Causa:</strong> No guardaste el resultado o el nombre del proyecto cambió.</p>
+                <p><strong>Solución:</strong> En el módulo de DPS, hacé clic en <strong>💾 Guardar Resultado</strong>. Verificá que el nombre del proyecto sea el mismo.</p>
+
+                <h3>❌ El Reparto no carga el proyecto automáticamente</h3>
+                <p><strong>Causa:</strong> No accediste desde el botón <strong>🔀 Reparto</strong> de la Suite principal.</p>
+                <p><strong>Solución:</strong> Volvé a la Suite principal, hacé clic en <strong>🔀 Reparto</strong>. Se guarda automáticamente y se abre el Reparto con el proyecto cargado.</p>
+
+                <h3>❌ Los PDF salen con caracteres raros (cuadrados)</h3>
+                <p><strong>Causa:</strong> La librería jsPDF no soporta emojis ni caracteres especiales fuera del rango latino.</p>
+                <p><strong>Solución:</strong> La app ya limpia los emojis automáticamente. Si ves caracteres raros, verificá que no haya nuevos emojis agregados sin limpiar en <code>limpiarTextoPDF()</code>.</p>
+
+                <h3>❌ "No se puede guardar, quota exceeded"</h3>
+                <p><strong>Causa:</strong> El localStorage está lleno (5-10 MB según navegador).</p>
+                <p><strong>Solución:</strong> Borrá proyectos viejos que no uses, o exportalos a JSON y después eliminálos.</p>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('multi-proyecto')">← Anterior</button>
+                    <button onclick="showSection('glosario')">Siguiente →</button>
+                </div>
+            </section>
+
+            <!-- ================================================ -->
+            <!-- SECCIÓN 12: GLOSARIO -->
+            <!-- ============================================ -->
+            <section class="manual-section" id="glosario">
+                <h2>📚 12. Glosario</h2>
+
+                <p>Siglas y términos utilizados en la Suite:</p>
+
+                <table>
+                    <thead>
+                        <tr><th>Sigla</th><th>Significado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>AEA</strong></td><td>Asociación Electrotécnica Argentina</td></tr>
+                        <tr><td><strong>IUG</strong></td><td>Iluminación de Uso General (bocas de luz)</td></tr>
+                        <tr><td><strong>TUG</strong></td><td>Tomacorriente de Uso General (enchufes comunes)</td></tr>
+                        <tr><td><strong>TUE</strong></td><td>Tomacorriente de Uso Especial (motores, AA, etc.)</td></tr>
+                        <tr><td><strong>DPMS</strong></td><td>Demanda de Potencia Máxima Simultánea</td></tr>
+                        <tr><td><strong>Icc</strong></td><td>Corriente de cortocircuito</td></tr>
+                        <tr><td><strong>PdC</strong></td><td>Poder de Corte (de una protección)</td></tr>
+                        <tr><td><strong>PAT</strong></td><td>Puesta a Tierra</td></tr>
+                        <tr><td><strong>PE</strong></td><td>Conductor de Protección (verde/amarillo)</td></tr>
+                        <tr><td><strong>DPS</strong></td><td>Dispositivo de Protección contra Sobretensiones</td></tr>
+                        <tr><td><strong>ID</strong></td><td>Interruptor Diferencial</td></tr>
+                        <tr><td><strong>PIA</strong></td><td>Pequeño Interruptor Automático (térmica)</td></tr>
+                        <tr><td><strong>GDC</strong></td><td>Grado de Caída (Ω/km) — resistividad del cable</td></tr>
+                        <tr><td><strong>ΔU</strong></td><td>Caída de tensión</td></tr>
+                        <tr><td><strong>Sla</strong></td><td>Superficie límite de aplicación (m²)</td></tr>
+                        <tr><td><strong>DDT</strong></td><td>Densidad de Descargas a Tierra (rayos/km²/año)</td></tr>
+                        <tr><td><strong>NPT</strong></td><td>Nivel de Piso Terminado (altura de referencia)</td></tr>
+                        <tr><td><strong>SOH</strong></td><td>Libre de Halógenos (cable especial)</td></tr>
+                        <tr><td><strong>XLPE</strong></td><td>Polietileno reticulado (aislación de cable)</td></tr>
+                        <tr><td><strong>PVC</strong></td><td>Policloruro de vinilo (aislación de cable)</td></tr>
+                        <tr><td><strong>IRAM</strong></td><td>Instituto Argentino de Normalización y Certificación</td></tr>
+                        <tr><td><strong>PWA</strong></td><td>Progressive Web App (app web instalable)</td></tr>
+                        <tr><td><strong>JSON</strong></td><td>JavaScript Object Notation (formato de datos)</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Más información</h3>
+                <ul>
+                    <li>🌐 <strong>Sitio oficial AEA:</strong> <a href="https://www.aea.org.ar" target="_blank">www.aea.org.ar</a></li>
+                    <li>📖 <strong>Normativa AEA 90364:</strong> disponible en el sitio de AEA</li>
+                    <li>📚 <strong>Reglamento de suministro:</strong> consultar con la distribuidora local</li>
+                </ul>
+
+                <div class="callout callout-ok">
+                    <strong>✅ Fin del manual</strong>
+                    Si llegaste hasta acá, ya conocés todas las funcionalidades de la Suite AEA 770 v8. ¡Buena suerte con tu proyecto!
+                </div>
+
+                <div class="manual-nav-buttons">
+                    <button onclick="showSection('faq')">← Anterior</button>
+                    <button onclick="window.location.href='index.html'">Volver al Diseño →</button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<script>
+// ============================================================
+// NAVEGACIÓN ENTRE SECCIONES
+// ============================================================
+function showSection(id) {
+    // Ocultar todas las secciones
+    document.querySelectorAll('.manual-section').forEach(s => s.classList.remove('active'));
+
+    // Mostrar la sección seleccionada
+    const section = document.getElementById(id);
+    if (section) {
+        section.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Actualizar el índice
+    document.querySelectorAll('.manual-toc a[data-section]').forEach(a => {
+        a.classList.toggle('active', a.dataset.section === id);
+    });
+
+    // Cerrar el sidebar en mobile
+    if (window.innerWidth <= 900) {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('active');
+    }
+
+    // Actualizar la URL (sin recargar)
+    history.replaceState(null, '', '#' + id);
+}
+
+// ============================================================
+// TOGGLE SIDEBAR EN MOBILE
+// ============================================================
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+}
+
+// ============================================================
+// INICIALIZACIÓN: Abrir la sección del hash si existe
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(hash)) {
+        showSection(hash);
+    } else {
+        showSection('intro');
+    }
+});
+
+// ============================================================
+// NAVEGACIÓN CON TECLADO (flechas)
+// ============================================================
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    const secciones = Array.from(document.querySelectorAll('.manual-section')).map(s => s.id);
+    const actual = secciones.findIndex(id => document.getElementById(id).classList.contains('active'));
+
+    if (e.key === 'ArrowRight' && actual < secciones.length - 1) {
+        showSection(secciones[actual + 1]);
+    } else if (e.key === 'ArrowLeft' && actual > 0) {
+        showSection(secciones[actual - 1]);
+    }
+});
+</script>
+
+</body>
+</html>
