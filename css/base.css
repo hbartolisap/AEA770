@@ -94,7 +94,7 @@ header {
 .header-center { text-align: center; min-width: 0; }
 .header-center h1 { font-size: 1.4em; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .header-center p { font-size: 0.78em; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.header-right { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: flex-end; align-items: center; }
+.header-right { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
 .header-right button {
     background: rgba(255,255,255,0.15);
     border: none; color: white;
