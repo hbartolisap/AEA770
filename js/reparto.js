@@ -15,18 +15,20 @@ const VA  = { iug: 440, tug: 2200, tue: 3300 };
 // ============================================================
 // CARGA AUTOMÁTICA DESDE LOCALSTORAGE (si viene del index)
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
+function cargarDesdeLocalStorage() {
     const data = localStorage.getItem('proyectoAEA_para_Reparto');
     if (data) {
         try {
             const p = JSON.parse(data);
             console.log('✅ Proyecto cargado automáticamente desde localStorage');
             importarProyecto(p);
+            return true;
         } catch (e) {
             console.warn('⚠️ No se pudo leer el proyecto desde localStorage:', e);
         }
     }
-});
+    return false;
+}
 
 // ============================================================
 // CARGA DEL JSON DE LA SUITE
@@ -639,4 +641,7 @@ window.toggleTema = toggleTema;
 // ============================================================
 // INICIO
 // ============================================================
-render();
+// Intentar cargar desde localStorage primero; si no hay, renderizar vacío
+if (!cargarDesdeLocalStorage()) {
+    render();
+}
