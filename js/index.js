@@ -2429,7 +2429,6 @@ function actualizarSelectorProyectos() {
 
 function capturarProyecto() {
     const proyecto = {
-    return {
         __id: proyectoActualId || null,
         version: '8.4-local',
         fecha: new Date().toISOString(),
@@ -2456,22 +2455,22 @@ function capturarProyecto() {
             seccion: document.getElementById('patSeccion').value,
             tipoJabalina: document.getElementById('patTipoJabalina').value
         }
-        
+    };
+
     // Validar que se puede serializar
     try {
         JSON.stringify(proyecto);
-        } catch (e) {
-            console.error('❌ capturarProyecto: error al serializar:', e);
-            // Buscar el campo problemático
-            Object.keys(proyecto).forEach(key => {
-                try {
-                    JSON.stringify(proyecto[key]);
-                } catch (err) {
-            console.error('Campo problemático:', key, err);
+    } catch (e) {
+        console.error('❌ capturarProyecto: error al serializar:', e);
+        Object.keys(proyecto).forEach(key => {
+            try {
+                JSON.stringify(proyecto[key]);
+            } catch (err) {
+                console.error('Campo problemático:', key, err);
             }
         });
     }
-    
+
     return proyecto;
 }
 
