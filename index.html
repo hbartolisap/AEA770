@@ -29,29 +29,26 @@
 <body>
 <div class="container">
     <header>
-    <div class="header-left">
-        <select class="proyecto-selector" id="selectorProyecto" onchange="cambiarProyecto(this.value)">
-            <option value="">-- Proyectos --</option>
-        </select>
-    </div>
-    <div class="header-center">
-        <h1>⚡ AEA 770 - Suite v8</h1>
-        <p>100% offline · PWA instalable · Sin dependencias externas</p>
-    </div>
-    <div class="header-right">
-        <button onclick="nuevoProyecto()">➕ Nuevo</button>
-        <button onclick="guardarProyecto()">💾 Guardar</button>
-        <button onclick="document.getElementById('inputFileJSON').click()">📁 Importar</button>
-        <button onclick="abrirModalJSON('exportar')">📤 JSON</button>
-        <button onclick="abrirModalJSON('importar')">📥 Pegar</button>
-        <button onclick="abrirRepartoTableros()" title="Reparto de circuitos por tablero">🔀 Reparto</button>
-        <button onclick="irAModuloDPS()" title="Módulo de Protección contra Sobretensiones">⚡ DPS</button>
-        <button onclick="irAModuloDocumentacion()" title="Documentación Anexo A">📄 Documentación</button>
-        <button onclick="abrirManual()" title="Manual de uso">📖 Manual</button>
-        <button onclick="irAModuloDocumentacion()" title="Documentación Anexo A">📄 Documentación</button>
-        <button onclick="toggleTema()">🌙</button>
-    </div>
-    <input type="file" id="inputFileJSON" accept=".json" style="display:none;" onchange="importarArchivoJSON(this)">
+        <div class="header-center">
+            <h1>⚡ AEA 770 - Suite v8</h1>
+            <p>100% offline · PWA instalable · Sin dependencias externas</p>
+        </div>
+        <div class="header-right">
+            <select class="proyecto-selector" id="selectorProyecto" onchange="cambiarProyecto(this.value)">
+                <option value="">-- Proyectos --</option>
+            </select>
+                <button onclick="nuevoProyecto()">➕ Nuevo</button>
+                <button onclick="guardarProyecto()">💾 Guardar</button>
+                <button onclick="document.getElementById('inputFileJSON').click()">📁 Importar</button>
+                <button onclick="abrirModalJSON('exportar')">📤 JSON</button>
+                <button onclick="abrirModalJSON('importar')">📥 Pegar</button>
+                <button onclick="abrirRepartoTableros()">🔀 Reparto</button>
+                <button onclick="irAModuloDPS()">⚡ DPS</button>
+                <button onclick="irAModuloDocumentacion()">📄 Documentación</button>
+                <button onclick="abrirManual()">📖 Manual</button>
+                <button onclick="toggleTema()">🌙</button>
+        </div>
+        <input type="file" id="inputFileJSON" accept=".json" style="display:none;" onchange="importarArchivoJSON(this)">
     </header>
 
     <div id="installBanner">
