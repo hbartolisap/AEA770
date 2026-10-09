@@ -2428,6 +2428,7 @@ function actualizarSelectorProyectos() {
 }
 
 function capturarProyecto() {
+    const proyecto = {
     return {
         __id: proyectoActualId || null,
         version: '8.4-local',
@@ -2455,7 +2456,23 @@ function capturarProyecto() {
             seccion: document.getElementById('patSeccion').value,
             tipoJabalina: document.getElementById('patTipoJabalina').value
         }
-    };
+        
+    // Validar que se puede serializar
+    try {
+        JSON.stringify(proyecto);
+        } catch (e) {
+            console.error('❌ capturarProyecto: error al serializar:', e);
+            // Buscar el campo problemático
+            Object.keys(proyecto).forEach(key => {
+                try {
+                    JSON.stringify(proyecto[key]);
+                } catch (err) {
+            console.error('Campo problemático:', key, err);
+            }
+        });
+    }
+    
+    return proyecto;
 }
 
 function aplicarProyecto(p) {
@@ -2829,6 +2846,82 @@ function irAModuloDPS() {
         alert('❌ No se pudo abrir el módulo de DPS. Revisá la consola para más detalles.');
     }
 }
+
+// ============================================================
+// IR AL MÓDULO DE DPS (FORZADO, LIMPIANDO CACHÉ)
+// ============================================================
+function irAModuloDPSForzado() {
+    try {
+        // 1. Limpiar TODOS los datos relacionados con DPS
+        localStorage.removeItem('proyectoAEA_para_DPS');
+        localStorage.removeItem('resultadoDPS_' + (document.getElementById('nombreProyecto').value || 'proyecto'));
+        
+        // 2. Guardar el proyecto actual limpio
+        if (!proyectoActualId) {
+            proyectoActualId = 'proy_' + Date.now();
+        }
+        const id = proyectoActualId;
+        const proyectos = obtenerProyectos();
+        
+        // 3. Capturar solo lo esencial para evitar datos corruptos
+        const proyectoLimpio = capturarProyecto();
+        
+        // 4. Validar que se puede serializar
+        const jsonDPS = JSON.stringify(proyectoLimpio);
+        if (!jsonDPS || jsonDPS.length < 10) {
+            throw new Error('El proyecto no se pudo serializar correctamente');
+        }
+        
+        // 5. Guardar en ambos lugares
+        proyectos[id] = proyectoLimpio;
+        localStorage.setItem('aea770_proyectos_v8_local', JSON.stringify(proyectos));
+        localStorage.setItem('proyectoAEA_para_DPS', jsonDPS);
+        localStorage.setItem('aea770_ultimo_proyecto', id);
+        
+        document.getElementById('selectorProyecto').value = id;
+        
+        console.log('✅ Proyecto limpio guardado para DPS. Longitud:', jsonDPS.length);
+        
+        // 6. Navegar
+        window.location.href = 'dps.html';
+    } catch (e) {
+        console.error('Error al forzar DPS:', e);
+        alert('❌ Error al preparar el proyecto para DPS:\n\n' + e.message + '\n\nSe va a intentar con un proyecto vacío.');
+        
+        // Fallback: crear un proyecto mínimo vacío
+        const proyectoVacio = {
+            __id: 'vacio_' + Date.now(),
+            version: '8.4-local',
+            fecha: new Date().toISOString(),
+            nombre: 'Proyecto Vacío',
+            supCubierta: 100,
+            supSemicubierta: 0,
+            iccOrigen: 4.5,
+            marca: 'Schneider',
+            tipoCable: 'unipolar',
+            tipoInstalacion: 'embutida',
+            ambientes: [],
+            circuitosPorTablero: {},
+            tableros: [{ id: 'Principal', nombre: 'Tablero Principal', planta: 'PB', long: 0, seccion: 4, iccArriba: 4.5, padre: null }],
+            planoElementos: [],
+            modoOscuro: false,
+            contadorTableros: 1,
+            acometida: {
+                longitud: 10, tipoCable: 'sintenax', seccion: 6, conductores: 4,
+                tipoInst: 'enterrado', proteccion: 'tubo_pvc_50'
+            },
+            puestaTierra: {
+                cantJabalina: 1, longCable: 10, seccion: 16, tipoJabalina: 'copperweld'
+            }
+        };
+        
+        localStorage.setItem('proyectoAEA_para_DPS', JSON.stringify(proyectoVacio));
+        localStorage.setItem('aea770_ultimo_proyecto', proyectoVacio.__id);
+        window.location.href = 'dps.html';
+    }
+}
+
+window.irAModuloDPSForzado = irAModuloDPSForzado;
 
 // ============================================================
 // IR AL MÓDULO DE DOCUMENTACIÓN

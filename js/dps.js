@@ -82,21 +82,58 @@ let resultadoActual = null;
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     const data = localStorage.getItem('proyectoAEA_para_DPS');
+    
     if (!data) {
-        alert('No se encontró un proyecto. Por favor, volvé a la página principal.');
+        alert('No se encontró un proyecto.\n\nVolvé a la Suite principal y hacé clic en ⚡ DPS.');
         window.location.href = 'index.html';
         return;
     }
+    
     try {
         proyecto = JSON.parse(data);
-        const previo = localStorage.getItem('resultadoDPS_' + (proyecto.nombre || 'proyecto'));
-        if (previo) {
-            try { resultadoActual = JSON.parse(previo); } catch(e) {}
+        
+        // Validación mínima
+        if (!proyecto || typeof proyecto !== 'object') {
+            throw new Error('El proyecto no es un objeto válido');
         }
+        if (!proyecto.nombre) {
+            proyecto.nombre = 'Proyecto sin nombre';
+        }
+        if (!proyecto.iccOrigen) {
+            proyecto.iccOrigen = 4.5;
+        }
+        if (!proyecto.acometida) {
+            proyecto.acometida = { tipoInst: 'enterrado', conductores: 4 };
+        }
+        if (!proyecto.marca) {
+            proyecto.marca = 'Schneider';
+        }
+        
+        // Cargar resultado previo del DPS si existe
+        try {
+            const previo = localStorage.getItem('resultadoDPS_' + (proyecto.nombre || 'proyecto'));
+            if (previo) {
+                resultadoActual = JSON.parse(previo);
+            }
+        } catch (e) {
+            console.warn('Resultado DPS previo corrupto, se ignora');
+            resultadoActual = null;
+        }
+        
         renderizarInterfaz();
     } catch (e) {
-        console.error(e);
-        alert('Error al leer los datos del proyecto.');
+        console.error('Error al parsear el proyecto:', e);
+        console.error('Contenido:', data.substring(0, 500));
+        
+        // Limpiar el dato corrupto
+        localStorage.removeItem('proyectoAEA_para_DPS');
+        
+        alert(
+            '❌ Error al leer los datos del proyecto.\n\n' +
+            'Detalle: ' + e.message + '\n\n' +
+            'El dato corrupto fue eliminado. Volvé a la Suite principal y hacé clic en ⚡ DPS (Forzar).'
+        );
+        
         window.location.href = 'index.html';
     }
 });
