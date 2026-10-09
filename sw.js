@@ -5,6 +5,7 @@ const ASSETS = [
   './dps.html',
   './reparto_tableros.html',
   './manual.html',
+  './documentacion.html',
   './manifest.json',
 
   // CSS separado
@@ -13,11 +14,13 @@ const ASSETS = [
   './css/dps.css',
   './css/reparto.css',
   './css/manual.css',
+  './css/documentacion.css',
 
   // JS separado
   './js/index.js',
   './js/dps.js',
   './js/reparto.js',
+  './js/documentacion.js',
 
   // Librerías
   './libs/jspdf.umd.min.js',

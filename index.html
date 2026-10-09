@@ -11,10 +11,9 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="theme-color" content="#667eea">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-title" content="AEA 770">
-
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AEA 770">
 
 <!-- Librerías LOCALES (sin CDN) -->
     <script src="libs/jspdf.umd.min.js"></script>
@@ -47,7 +46,9 @@
         <button onclick="abrirModalJSON('importar')">📥 Pegar</button>
         <button onclick="abrirRepartoTableros()" title="Reparto de circuitos por tablero">🔀 Reparto</button>
         <button onclick="irAModuloDPS()" title="Módulo de Protección contra Sobretensiones">⚡ DPS</button>
+        <button onclick="irAModuloDocumentacion()" title="Documentación Anexo A">📄 Documentación</button>
         <button onclick="abrirManual()" title="Manual de uso">📖 Manual</button>
+        <button onclick="irAModuloDocumentacion()" title="Documentación Anexo A">📄 Documentación</button>
         <button onclick="toggleTema()">🌙</button>
     </div>
     <input type="file" id="inputFileJSON" accept=".json" style="display:none;" onchange="importarArchivoJSON(this)">

@@ -19,7 +19,7 @@
     </div>
     <div class="manual-header-right">
         <button onclick="window.print()">🖨️ Imprimir / PDF</button>
-        <button onclick="window.location.href='index.html'">← Volver al Diseño</button>
+        <button onclick="volverAlDiseno()">← Volver al Diseño</button>
     </div>
 </header>
 
@@ -53,10 +53,11 @@
 
             <li><a class="toc-section">Gestión</a></li>
             <li><a onclick="showSection('multi-proyecto')" data-section="multi-proyecto">10. Multi-proyecto</a></li>
+            <li><a onclick="showSection('documentacion')" data-section="documentacion">11. Módulo de Documentación</a></li>
 
             <li><a class="toc-section">Ayuda</a></li>
-            <li><a onclick="showSection('faq')" data-section="faq">11. Preguntas frecuentes</a></li>
-            <li><a onclick="showSection('glosario')" data-section="glosario">12. Glosario</a></li>
+            <li><a onclick="showSection('faq')" data-section="faq">12. Preguntas frecuentes</a></li>
+            <li><a onclick="showSection('glosario')" data-section="glosario">13. Glosario</a></li>
         </ul>
     </aside>
 
@@ -823,11 +824,40 @@
                 </div>
             </section>
 
+            <section class="manual-section" id="documentacion">
+                <h2>📄 11. Módulo de Documentación</h2>
+                <p>El módulo de documentación genera la <strong>documentación completa exigida por el Anexo A de la AEA 770</strong>.</p>
+
+            <h3>10.1. Cómo acceder</h3>
+                <ol>
+                    <li>Cargá un proyecto en la Suite principal.</li>
+                    <li>Hacé clic en el botón <strong>📄 Documentación</strong> en el header.</li>
+                    <li>La app guarda el proyecto automáticamente y navega al módulo.</li>
+                </ol>
+
+            <h3>10.2. Contenido generado</h3>
+                <ul>
+                    <li><strong>Memoria Técnica Descriptiva:</strong> resumen del proyecto con datos generales, acometida, PAT y DPS.</li>
+                    <li><strong>Esquema Unifilar:</strong> diagrama SVG con medidor, tableros en cascada y circuitos.</li>
+                    <li><strong>Listado de Materiales:</strong> con marca, modelo, cantidad y norma IRAM.</li>
+                    <li><strong>Protocolo de Verificación:</strong> ensayos según AEA 770.</li>
+                    <li><strong>Manual de Uso y Mantenimiento:</strong> recomendaciones para el usuario final.</li>
+                </ul>
+
+            <h3>10.3. Salida</h3>
+            <p>Un único archivo PDF con toda la documentación, listo para presentar al colegio profesional.</p>
+
+        <div class="manual-nav-buttons">
+            <button onclick="showSection('multi-proyecto')">← Anterior</button>
+            <button onclick="showSection('faq')">Siguiente →</button>
+        </div>
+        </section>
+
             <!-- ================================================ -->
-            <!-- SECCIÓN 11: FAQ -->
+            <!-- SECCIÓN 12: FAQ -->
             <!-- ============================================ -->
             <section class="manual-section" id="faq">
-                <h2>❓ 11. Preguntas frecuentes</h2>
+                <h2>❓ 12. Preguntas frecuentes</h2>
 
                 <h3>❌ Error: "Cannot register ServiceWorker for scope..."</h3>
                 <p><strong>Causa:</strong> Estás abriendo la Suite con <code>file://</code> en vez de <code>http://</code> o <code>https://</code>.</p>
@@ -880,10 +910,10 @@
             </section>
 
             <!-- ================================================ -->
-            <!-- SECCIÓN 12: GLOSARIO -->
+            <!-- SECCIÓN 13: GLOSARIO -->
             <!-- ============================================ -->
             <section class="manual-section" id="glosario">
-                <h2>📚 12. Glosario</h2>
+                <h2>📚 13. Glosario</h2>
 
                 <p>Siglas y términos utilizados en la Suite:</p>
 
@@ -932,7 +962,7 @@
 
                 <div class="manual-nav-buttons">
                     <button onclick="showSection('faq')">← Anterior</button>
-                    <button onclick="window.location.href='index.html'">Volver al Diseño →</button>
+                    <button onclick="volverAlDiseno()">Volver al Diseño →</button>
                 </div>
             </section>
 
@@ -1007,6 +1037,18 @@ document.addEventListener('keydown', (e) => {
         showSection(secciones[actual - 1]);
     }
 });
+
+// ============================================================
+// VOLVER AL DISEÑO (restaura el último proyecto)
+// ============================================================
+function volverAlDiseno() {
+    // El index.js se encarga de cargar el último proyecto automáticamente
+    // al detectar 'aea770_ultimo_proyecto' en el localStorage.
+    window.location.href = 'index.html';
+}
+
+window.volverAlDiseno = volverAlDiseno;
+
 </script>
 
 </body>
