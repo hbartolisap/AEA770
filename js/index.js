@@ -1166,7 +1166,7 @@ function poblarSelectorTableros() {
 }
 
 // ============================================================
-// DISTRIBUCIÓN DE CIRCUITOS
+// DISTRIBUCIÓN DE CIRCUITOS (CON CIRCUITOS EXCLUSIVOS PARA BAÑO Y COCINA)
 // ============================================================
 function distribuirCircuitosPorTablero() {
     const previos = {};
@@ -1184,76 +1184,127 @@ function distribuirCircuitosPorTablero() {
     circuitosPorTablero = {};
     tableros.forEach(t => { circuitosPorTablero[t.id] = []; });
 
-    const bocasPorTablero = {};
-    tableros.forEach(t => { bocasPorTablero[t.id] = { iug: 0, tug: 0, tue: 0 }; });
+    // Agrupar ambientes por tablero y por tipo especial (Baño, Cocina)
+    const ambientesPorTablero = {};
+    tableros.forEach(t => {
+        ambientesPorTablero[t.id] = {
+            normales: [], // Ambientes que no son Baño ni Cocina
+            banios: [],
+            cocinas: []
+        };
+    });
 
     ambientes.forEach(amb => {
-        if (!bocasPorTablero[amb.tablero]) {
+        if (!ambientesPorTablero[amb.tablero]) {
             const principal = tableros.find(t => !t.padre);
             if (principal) amb.tablero = principal.id;
             return;
         }
-        const b = calcularBocas(amb);
-        bocasPorTablero[amb.tablero].iug += b.iug;
-        bocasPorTablero[amb.tablero].tug += b.tug;
-        bocasPorTablero[amb.tablero].tue += b.tue;
+        const tipo = amb.tipo;
+        if (tipo === 'Baño') {
+            ambientesPorTablero[amb.tablero].banios.push(amb);
+        } else if (tipo === 'Cocina' || tipo === 'Kitchenette') {
+            ambientesPorTablero[amb.tablero].cocinas.push(amb);
+        } else {
+            ambientesPorTablero[amb.tablero].normales.push(amb);
+        }
     });
 
     let nGlobal = 1;
-    tableros.forEach(t => {
-        const bocas = bocasPorTablero[t.id];
-        const iccSeccional = t.iccArriba;
 
-        let restIUG = bocas.iug;
-        while (restIUG > 0) {
-            const cant = Math.min(restIUG, 15);
+    // Función auxiliar para crear circuitos a partir de una lista de bocas
+    function crearCircuitos(tableroId, tipoCircuito, bocasTotales, maxPorCircuito, dpmsPorCircuito, valoresPrevios) {
+        let restante = bocasTotales;
+        while (restante > 0) {
+            const cant = Math.min(restante, maxPorCircuito);
             const nombre = 'C' + nGlobal;
-            const prev = previos[nombre] || {};
-            circuitosPorTablero[t.id].push({
-                nombre, tablero: t.id, tipo: 'IUG', bocas: cant,
-                dpms: 440,
-                seccion: prev.seccion !== undefined ? prev.seccion : 1.5,
-                proteccion: prev.proteccion !== undefined ? prev.proteccion : 10,
-                longitud: prev.longitud !== undefined ? prev.longitud : 10,
+            const prev = valoresPrevios[nombre] || {};
+            circuitosPorTablero[tableroId].push({
+                nombre,
+                tablero: tableroId,
+                tipo: tipoCircuito,
+                bocas: cant,
+                dpms: dpmsPorCircuito,
+                seccion: prev.seccion !== undefined ? prev.seccion : (tipoCircuito === 'IUG' ? 1.5 : 2.5),
+                proteccion: prev.proteccion !== undefined ? prev.proteccion : (tipoCircuito === 'IUG' ? 10 : (tipoCircuito === 'TUG' ? 16 : 20)),
+                longitud: prev.longitud !== undefined ? prev.longitud : (tipoCircuito === 'IUG' ? 10 : (tipoCircuito === 'TUG' ? 15 : 20)),
                 potenciaMotor: prev.potenciaMotor,
-                iccArriba: iccSeccional
+                iccArriba: tableros.find(t => t.id === tableroId)?.iccArriba || null
             });
-            restIUG -= cant; nGlobal++;
+            restante -= cant;
+            nGlobal++;
         }
-        let restTUG = bocas.tug;
-        while (restTUG > 0) {
-            const cant = Math.min(restTUG, 15);
-            const nombre = 'C' + nGlobal;
-            const prev = previos[nombre] || {};
-            circuitosPorTablero[t.id].push({
-                nombre, tablero: t.id, tipo: 'TUG', bocas: cant,
-                dpms: 2200,
-                seccion: prev.seccion !== undefined ? prev.seccion : 2.5,
-                proteccion: prev.proteccion !== undefined ? prev.proteccion : 16,
-                longitud: prev.longitud !== undefined ? prev.longitud : 15,
-                potenciaMotor: prev.potenciaMotor,
-                iccArriba: iccSeccional
+    }
+
+    // Para cada tablero, procesar primero los circuitos exclusivos de Baño y Cocina
+    tableros.forEach(t => {
+        const iccSeccional = t.iccArriba;
+        const grupos = ambientesPorTablero[t.id];
+
+        // --- CIRCUITOS EXCLUSIVOS DE BAÑO ---
+        if (grupos.banios.length > 0) {
+            let bocasIUG = 0, bocasTUG = 0, bocasTUE = 0;
+            grupos.banios.forEach(amb => {
+                const b = calcularBocas(amb);
+                bocasIUG += b.iug;
+                bocasTUG += b.tug;
+                bocasTUE += b.tue;
             });
-            restTUG -= cant; nGlobal++;
+
+            // Para baños, forzamos que cada ambiente tenga su propio circuito
+            // Pero como puede haber varios baños, agrupamos por tipo de boca
+            // y creamos circuitos que no superen el máximo.
+            // Además, para baños, la sección mínima suele ser 2.5 mm² para TUG.
+            
+            // IUG de baños: máximo 15 bocas por circuito (pero cada baño suele tener 1 IUG)
+            crearCircuitos(t.id, 'IUG', bocasIUG, 15, 440, previos);
+            // TUG de baños: máximo 15 bocas, pero para baños es común usar 2.5 mm²
+            // Aquí ya usamos 2.5 mm² por defecto para TUG
+            crearCircuitos(t.id, 'TUG', bocasTUG, 15, 2200, previos);
+            // TUE de baños (si hubiera)
+            crearCircuitos(t.id, 'TUE', bocasTUE, 12, 3300, previos);
         }
-        let restTUE = bocas.tue;
-        while (restTUE > 0) {
-            const cant = Math.min(restTUE, 12);
-            const nombre = 'C' + nGlobal;
-            const prev = previos[nombre] || {};
-            circuitosPorTablero[t.id].push({
-                nombre, tablero: t.id, tipo: 'TUE', bocas: cant,
-                dpms: 3300,
-                seccion: prev.seccion !== undefined ? prev.seccion : 2.5,
-                proteccion: prev.proteccion !== undefined ? prev.proteccion : 20,
-                longitud: prev.longitud !== undefined ? prev.longitud : 20,
-                potenciaMotor: prev.potenciaMotor !== undefined ? prev.potenciaMotor : 2800,
-                iccArriba: iccSeccional
+
+        // --- CIRCUITOS EXCLUSIVOS DE COCINA ---
+        if (grupos.cocinas.length > 0) {
+            let bocasIUG = 0, bocasTUG = 0, bocasTUE = 0;
+            grupos.cocinas.forEach(amb => {
+                const b = calcularBocas(amb);
+                bocasIUG += b.iug;
+                bocasTUG += b.tug;
+                bocasTUE += b.tue;
             });
-            restTUE -= cant; nGlobal++;
+
+            crearCircuitos(t.id, 'IUG', bocasIUG, 15, 440, previos);
+            crearCircuitos(t.id, 'TUG', bocasTUG, 15, 2200, previos);
+            crearCircuitos(t.id, 'TUE', bocasTUE, 12, 3300, previos);
+        }
+
+        // --- CIRCUITOS NORMALES (RESTO DE AMBIENTES) ---
+        if (grupos.normales.length > 0) {
+            let bocasIUG = 0, bocasTUG = 0, bocasTUE = 0;
+            grupos.normales.forEach(amb => {
+                const b = calcularBocas(amb);
+                bocasIUG += b.iug;
+                bocasTUG += b.tug;
+                bocasTUE += b.tue;
+            });
+
+            crearCircuitos(t.id, 'IUG', bocasIUG, 15, 440, previos);
+            crearCircuitos(t.id, 'TUG', bocasTUG, 15, 2200, previos);
+            crearCircuitos(t.id, 'TUE', bocasTUE, 12, 3300, previos);
         }
     });
+
+    // Asegurar que todos los circuitos tengan iccArriba actualizado
+    Object.keys(circuitosPorTablero).forEach(tid => {
+        const icc = tableros.find(t => t.id === tid)?.iccArriba || null;
+        circuitosPorTablero[tid].forEach(c => {
+            c.iccArriba = icc;
+        });
+    });
 }
+
 
 // ============================================================
 // DPMS
