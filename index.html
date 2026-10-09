@@ -15,14 +15,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AEA 770">
 
+<!-- CSS separado -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/index.css">
+    
 <!-- Librerías LOCALES (sin CDN) -->
     <script src="libs/jspdf.umd.min.js"></script>
     <script src="libs/jspdf.plugin.autotable.min.js"></script>
     <script src="libs/xlsx.full.min.js"></script>
 
-<!-- CSS separado -->
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/index.css">
 
 </head>
 
@@ -44,6 +45,7 @@
                 <button onclick="abrirModalJSON('importar')">📥 Pegar</button>
                 <button onclick="abrirRepartoTableros()">🔀 Reparto</button>
                 <button onclick="irAModuloDPS()">⚡ DPS</button>
+                <button onclick="irAModuloDPSForzado()" title="Limpiar caché del DPS y volver a abrir">🔧 DPS (Forzar)</button>
                 <button onclick="irAModuloDocumentacion()">📄 Documentación</button>
                 <button onclick="abrirManual()">📖 Manual</button>
                 <button onclick="toggleTema()">🌙</button>
