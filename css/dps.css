@@ -1,0 +1,179 @@
+/* ============================================================
+   DPS.CSS - Estilos específicos del módulo de DPS
+   ============================================================ */
+
+/* --- Contenedor (más chico que el de la suite principal) --- */
+.container {
+    max-width: 1100px;
+    margin: 20px auto;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* --- Header del DPS (más simple que el de la suite) --- */
+header {
+    background: var(--card-header);
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+header h1 { font-size: 1.5em; }
+header .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+header button {
+    background: rgba(255,255,255,0.15);
+    color: white; border: none;
+    padding: 8px 16px; border-radius: 8px;
+    cursor: pointer; font-weight: 600;
+    font-size: 0.9em;
+}
+header button:hover { background: rgba(255,255,255,0.3); }
+
+/* --- Contenido principal --- */
+.content { padding: 30px; }
+.content h2 {
+    font-size: 1.2em;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-top: 25px;
+}
+.content h2:first-child { margin-top: 0; }
+
+/* --- Grid de formulario --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* --- Result box (con estilos propios del DPS) --- */
+.result-box {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 5px solid;
+    line-height: 1.6;
+}
+.result-box.ok { background: var(--ok); border-color: var(--ok-border); color: var(--ok-text); }
+.result-box.warn { background: var(--warn); border-color: var(--warn-border); color: var(--warn-text); }
+.result-box.error { background: var(--error); border-color: var(--error-border); color: var(--error-text); }
+.result-box h3 { margin-bottom: 10px; font-size: 1.1em; }
+.result-box ul { margin-left: 20px; margin-top: 8px; }
+.result-box li { margin-bottom: 5px; }
+
+/* --- Tabla (más específica del DPS) --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+th, td {
+    padding: 10px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+th {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+tr:hover { background: var(--bg); }
+
+/* --- Badges (más específicos del DPS) --- */
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 700;
+}
+.badge.ok { background: var(--ok); color: var(--ok-text); }
+.badge.warn { background: var(--warn); color: var(--warn-text); }
+.badge.error { background: var(--error); color: var(--error-text); }
+.badge.info { background: var(--info); color: var(--info-text); }
+
+/* --- Actions (barra inferior de botones) --- */
+.actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border);
+    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.actions button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1em;
+}
+.actions button:hover { background: var(--accent-dark); }
+.actions button.success { background: #27ae60; }
+.actions button.success:hover { background: #229954; }
+.actions .actions-right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* --- Stat grid (tarjetas de estadísticas) --- */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 15px 0;
+}
+.stat {
+    background: var(--bg);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+.stat .value {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: var(--accent);
+}
+.stat .label {
+    font-size: 0.8em;
+    color: var(--text-light);
+    margin-top: 4px;
+}
+
+/* --- Card (contenedor de notas) --- */
+.card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+}
+.card h4 {
+    margin-bottom: 10px;
+    color: var(--text);
+    font-size: 1em;
+}
+/* Alias para compatibilidad con dps.css y reparto.css */
+:root {
+    --bg: var(--table-header);
+    --card: var(--card-bg);
+    --header: var(--card-header);
+}
+body.dark {
+    --bg: var(--table-header);
+    --card: var(--card-bg);
+    --header: var(--card-header);
+}

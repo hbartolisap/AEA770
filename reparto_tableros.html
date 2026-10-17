@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reparto de Circuitos por Tablero - AEA 770</title>
+
+<!-- PWA Manifest e íconos -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#667eea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AEA 770">
+
+<!-- CSS separado -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/reparto.css">
+
+<!-- Librerías LOCALES para exportar -->
+<script src="libs/jspdf.umd.min.js"></script>
+<script src="libs/jspdf.plugin.autotable.min.js"></script>
+<script src="libs/xlsx.full.min.js"></script>
+</head>
+<body>
+<h1>⚡ Reparto de Circuitos por Tablero - AEA 770</h1>
+
+<!-- ============ PASO 0: CARGA DE DATOS ============ -->
+<div class="card">
+    <h2>0. Cargar proyecto de la Suite AEA 770</h2>
+    <div class="toolbar">
+        <label class="file-input">
+            📁 Cargar JSON de la Suite
+            <input type="file" accept=".json" onchange="cargarJSONSuite(this)">
+        </label>
+        <button class="btn-auto" onclick="cargarEjemplo()">📄 Cargar ejemplo</button>
+        <button onclick="limpiarTodo()">🗑️ Limpiar</button>
+        <label>
+            <input type="checkbox" id="temaOscuro" onchange="toggleTema()"> Modo oscuro
+        </label>
+    </div>
+    <div class="info" id="infoProyecto">
+        Sin proyecto cargado. Cargá el JSON exportado desde la Suite AEA 770 v8
+        (botón <strong>📤 JSON</strong>) o usá el ejemplo.
+    </div>
+</div>
+
+<!-- ============ PASO 1: AMBIENTES POR TABLERO ============ -->
+<div class="card">
+    <h2>1. Ambientes por tablero</h2>
+    <p style="color:var(--text-light);font-size:0.9em;">
+        La columna <strong>Tablero</strong> define a qué tablero se asigna cada ambiente.
+        Podés cambiarla con el selector. Las bocas vienen del proyecto cargado.
+    </p>
+    <table id="tablaAmbientes">
+        <thead>
+            <tr>
+                <th>Tablero</th>
+                <th>Ambiente</th>
+                <th>Tipo</th>
+                <th>m²</th>
+                <th>IUG</th>
+                <th>TUG</th>
+                <th>TUE</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+        <tfoot>
+            <tr>
+                <td colspan="8" style="text-align:right;">
+                    <button class="btn-add" onclick="agregarFila()">➕ Agregar ambiente manual</button>
+                    <button class="btn-auto" onclick="distribuirAuto()">✨ Distribución automática</button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- ============ PASO 2: RESUMEN POR TABLERO ============ -->
+<div class="card">
+    <h2>2. Resumen por tablero</h2>
+    <div id="resumen"></div>
+</div>
+
+<!-- ============ PASO 3: LISTA DE CIRCUITOS ============ -->
+<div class="card">
+    <h2>3. Lista de circuitos por tablero (con zona/área)</h2>
+    <div id="listaCircuitos"></div>
+</div>
+
+<!-- ============ PASO 4: RESUMEN GLOBAL ============ -->
+<div class="card">
+    <h2>4. Resumen global</h2>
+    <div id="resumenGlobal"></div>
+</div>
+
+<!-- ============ PASO 5: EXPORTAR ============ -->
+<div class="card">
+    <h2>5. Exportar resultados</h2>
+    <div class="toolbar">
+        <button class="btn-export" onclick="exportarExcelReparto()">📥 Excel</button>
+        <button class="btn-pdf" onclick="exportarPDFReparto()">📄 PDF</button>
+    </div>
+    <div class="info">
+        La exportación incluye: ambientes por tablero, resumen por tablero,
+        lista de circuitos con zonas y resumen global.
+    </div>
+</div>
+
+<div class="info">
+    <strong>Reglas aplicadas (AEA 770):</strong><br>
+    • IUG: máx. 15 bocas/circuito · protección máx. 16 A · 440 VA por circuito<br>
+    • TUG: máx. 15 bocas/circuito · protección máx. 20 A · 2200 VA por circuito<br>
+    • TUE: máx. 12 bocas/circuito · protección máx. 32 A · 3300 VA por circuito<br>
+    • Fórmula: circuitos = ⌈bocas / máximo_por_circuito⌉<br>
+    • La asignación de bocas a cada circuito se hace respetando la agrupación por ambiente,
+      así cada circuito queda asociado a una <strong>zona/área</strong> concreta.
+</div>
+
+<!-- JS separado -->
+<script src="js/reparto.js"></script>
+
+</body>
+</html>

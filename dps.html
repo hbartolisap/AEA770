@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo de DPS - AEA 771</title>
+
+    <!-- CSS separado -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/dps.css">
+
+    <!-- Librerías LOCALES (sin CDN) -->
+    <script src="libs/jspdf.umd.min.js"></script>
+    <script src="libs/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-center">
+                <h1>⚡ Módulo de DPS (AEA 771)</h1>
+                <p>Evaluación de protección contra sobretensiones</p>
+            </div>
+            <div class="header-right">
+                <button onclick="toggleTema()">🌙 Tema</button>
+                <button onclick="volverAlDiseno()">← Volver al Diseño</button>
+            </div>
+        </header>
+
+        <!-- ✅ ESTE ES EL DIV QUE FALTABA -->
+        <div class="content" id="mainContent">
+            <div style="padding:20px;text-align:center;color:var(--text-light);">
+                Cargando módulo de DPS...
+            </div>
+        </div>
+    </div>
+
+    <!-- JS separado - al final para que el DOM esté listo -->
+    <script src="js/dps.js"></script>
+</body>
+</html>

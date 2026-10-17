@@ -1,0 +1,88 @@
+/* ============================================================
+   INDEX.CSS - Estilos específicos de la Suite Principal
+   ============================================================ */
+
+.proyecto-selector {
+    background: rgba(255,255,255,0.15);
+    border: none; color: white;
+    padding: 7px 12px; border-radius: 18px;
+    font-size: 0.78em; cursor: pointer;
+    max-width: 200px; width: auto;
+}
+.proyecto-selector option { color: #333; }
+
+/* --- Steps (secciones del formulario) --- */
+.step { padding: 20px 30px; border-bottom: 1px solid var(--border); }
+.step h2 { font-size: 1.05em; color: var(--text); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+
+/* --- Form rows --- */
+.form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+.form-row .form-group { flex: 1 1 180px; min-width: 0; }
+.form-group { display: flex; flex-direction: column; }
+.form-group button { margin-top: auto; }
+
+/* --- Banner de instalación PWA --- */
+#installBanner {
+    display: none;
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white; padding: 12px 20px;
+    border-radius: 10px; margin-bottom: 15px;
+    text-align: center; font-size: 0.9em;
+}
+#installBanner button { background: white; color: #27ae60; font-weight: 700; padding: 6px 14px; margin-left: 10px; }
+
+/* --- Inputs de bocas editables --- */
+.bocas-input-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.bocas-input-wrap input { width: 60px; padding: 3px; text-align: center; font-weight: 700; }
+.bocas-min { font-size: 0.72em; color: var(--text-light); font-weight: 400; }
+.bocas-badge-extra { display: inline-block; background: #3498db; color: white; font-size: 0.68em; font-weight: 700; padding: 1px 5px; border-radius: 8px; margin-left: 3px; }
+
+/* --- Tableros --- */
+.tablero-card { background: var(--card-bg); border: 2px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 12px; }
+.tablero-card h4 { color: var(--text); font-size: 0.95em; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid var(--accent); }
+.tablero-card .form-row { margin-bottom: 8px; }
+
+/* --- Alturas --- */
+.alturas-cell { font-size: 0.78em; line-height: 1.5; text-align: left; min-width: 130px; }
+.alturas-cell .alt-row { display: flex; justify-content: space-between; gap: 8px; padding: 1px 0; }
+.alturas-cell .alt-label { color: var(--text-light); font-weight: 400; }
+.alturas-cell .alt-value { font-weight: 700; color: var(--text); }
+.alturas-ref-table { width: 100%; font-size: 0.78em; }
+.alturas-ref-table th { background: var(--accent); color: white; font-size: 0.72em; }
+.alturas-ref-table td { text-align: left; padding: 6px; }
+.alturas-ref-table td.center { text-align: center; }
+
+/* --- Matriz AEA --- */
+.matriz-aea-table { width: 100%; font-size: 0.72em; border-collapse: collapse; }
+.matriz-aea-table th { background: var(--accent); color: white; padding: 6px 4px; font-size: 0.68em; text-align: center; }
+.matriz-aea-table td { padding: 5px 4px; text-align: center; border: 1px solid var(--border); font-size: 0.95em; }
+.matriz-aea-table td:first-child, .matriz-aea-table td:nth-child(2) { text-align: left; font-weight: 600; font-size: 0.85em; }
+.matriz-aea-table td.cell-permitido { background: #d4edda; color: #155724; font-weight: 700; }
+.matriz-aea-table td.cell-no-permitido { background: #f8d7da; color: #721c24; font-weight: 700; }
+.matriz-aea-table td.cell-solo-pe { background: #fff3cd; color: #856404; font-weight: 700; }
+
+/* --- Inputs editables de circuitos --- */
+.circ-input { width: 70px; padding: 3px 4px; font-size: 0.85em; text-align: center; border: 1px solid var(--input-border); border-radius: 5px; background: var(--input-bg); color: var(--text); }
+.circ-input.editable { border-color: var(--accent); background: var(--input-bg); }
+.circ-select { padding: 3px 4px; font-size: 0.82em; border: 1px solid var(--input-border); border-radius: 5px; background: var(--input-bg); color: var(--text); max-width: 90px; }
+
+/* --- Plano editor --- */
+.plano-toolbar { display: flex; gap: 8px; margin-bottom: 10px; padding: 10px; background: var(--table-header); border-radius: 8px; flex-wrap: wrap; align-items: center; }
+.plano-toolbar button { padding: 6px 12px; font-size: 0.82em; margin: 0; }
+.plano-toolbar button.active { background: #27ae60; box-shadow: 0 0 0 2px rgba(39,174,96,0.4); }
+.plano-editor-wrap { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: auto; max-height: 700px; position: relative; }
+#planoCanvas { display: block; cursor: crosshair; background: #fafafa; }
+body.dark #planoCanvas { background: #2a2a3e; }
+.plano-info { display: flex; gap: 15px; margin-top: 10px; padding: 10px; background: var(--table-header); border-radius: 8px; font-size: 0.85em; flex-wrap: wrap; }
+.plano-info span { color: var(--text-light); }
+.plano-info strong { color: var(--text); }
+
+/* --- Panel de elemento seleccionado --- */
+.elemento-seleccionado { position: fixed; bottom: 20px; right: 20px; background: var(--card-bg); border: 2px solid var(--accent); border-radius: 8px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 0.85em; z-index: 500; min-width: 220px; }
+.elemento-seleccionado h4 { margin-bottom: 8px; font-size: 0.95em; }
+.elemento-seleccionado input, .elemento-seleccionado select { margin-bottom: 6px; padding: 5px 8px; font-size: 0.85em; }
+.elemento-seleccionado button { padding: 5px 10px; font-size: 0.8em; margin: 2px; }
+
+/* --- SVG container --- */
+.canvas-container, .svg-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow-x: auto; }
+.svg-container svg { display: block; margin: 0 auto; max-width: 100%; }
